@@ -1,2 +1,3 @@
-# bt-likes-it-clean
-Clean deployment for BT Likes It
+# BT Likes It
+
+Det här är en ren version av kampanjsidan.
