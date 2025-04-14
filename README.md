@@ -1,3 +1,3 @@
-# BT Likes It
+# BT 
 
-Det här är en ren version av kampanjsidan.
+Det här är en ren version.
