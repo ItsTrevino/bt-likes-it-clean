@@ -8,148 +8,125 @@
     body {
       margin: 0;
       padding: 0;
-      background-color: #000;
+      background: #000;
+      color: #fff;
       font-family: sans-serif;
-      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
     }
-
-    #canvas {
-      display: block;
-      margin: 40px auto;
-      border: 2px solid #fff;
+    h1 {
+      margin-top: 20px;
+      font-size: 2rem;
     }
-
-    .center {
-      text-align: center;
+    form {
       margin-top: 20px;
     }
-
     input {
-      font-size: 1.2rem;
-      padding: 0.4rem;
-      width: 300px;
-      text-align: center;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
     }
-
     button {
-      padding: 0.5rem 1rem;
-      font-size: 1.1rem;
+      padding: 10px 15px;
+      font-size: 1rem;
       margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: gold;
       cursor: pointer;
     }
-
-    .hint {
-      font-size: 0.9rem;
-      color: #aaa;
-      margin-top: 10px;
+    canvas {
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
+  <h1>BT LIKES IT – Kampanjsidan är igång</h1>
+  <form id="nameForm">
+    <input type="text" id="firstName" placeholder="Förnamn" required>
+    <input type="text" id="lastName" placeholder="Efternamn" required>
+    <button type="submit">Generera</button>
+  </form>
   <canvas id="canvas" width="1080" height="1350"></canvas>
 
-  <div class="center">
-    <input type="text" id="nameInput" placeholder="Skriv ditt namn här i versaler..." />
-    <button onclick="generate()">Generera</button>
-    <div class="hint">Endast svenska bokstäver (A–Ö) och mellanslag</div>
-  </div>
-
   <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-
-    const MARGIN_X = 30;
-    const MAX_NAME_WIDTH = canvasWidth - 2 * MARGIN_X;
-    const lineSpacingFactor = 1.1;
-
-    const images = {};
-
-    const loadImage = (src) => {
-      return new Promise((resolve) => {
+    async function loadImage(src) {
+      return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
+        img.onerror = reject;
         img.src = src;
       });
-    };
+    }
 
-    const loadAllImages = async () => {
-      const letters = [
-        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
-        "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Å", "Ä", "Ö", " "
-      ];
+    async function generateImage(firstName, lastName) {
+      const name = (firstName + " " + lastName).toUpperCase();
+      const images = {};
+      const letters = [...new Set(name.replace(/[^A-ZÅÄÖ ]/gi, ""))];
+
+      // Ladda bakgrund och "likes-it"
+      images["background"] = await loadImage("/images/background.png");
+      images["likes-it"] = await loadImage("/images/likes-it.png");
+
       for (const letter of letters) {
-        const filename = letter === " " ? "space" : letter;
-        images[letter] = await loadImage(`public/images/${filename}.png`);
+        const filename = letter === " " ? null : letter.toUpperCase();
+        if (filename) {
+          images[letter] = await loadImage(`/images/${filename}.png`);
+        }
       }
-      images["background"] = await loadImage("public/images/background.png");
-      images["likes-it"] = await loadImage("public/images/likes-it.png");
-    };
 
-    const drawName = (name) => {
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      ctx.drawImage(images["background"], 0, 0, canvasWidth, canvasHeight);
+      // Rita bakgrund
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(images["background"], 0, 0, canvas.width, canvas.height);
 
-      const nameParts = name.trim().toUpperCase().split(" ");
-      const [line1, line2] = nameParts.length > 1
-        ? [nameParts.slice(0, -1).join(" "), nameParts.slice(-1).join(" ")]
-        : [nameParts[0], ""];
+      // Rita namn (bokstav för bokstav)
+      const top = 420;
+      const lineHeight = 250;
+      const startX = 60;
+      const maxWidth = canvas.width - 2 * startX;
+      const words = name.split(" ");
 
-      const lines = [line1, line2];
+      words.forEach((word, lineIndex) => {
+        const totalLetterWidth = maxWidth / word.length;
+        [...word].forEach((char, i) => {
+          const img = images[char];
+          if (!img) return;
 
-      const calculateScale = (text) => {
-        let totalWidth = 0;
-        for (const char of text) {
-          const img = images[char] || images[" "];
-          totalWidth += img.width;
-        }
-        return MAX_NAME_WIDTH / totalWidth;
-      };
+          const aspect = img.height / img.width;
+          const width = totalLetterWidth;
+          const height = width * aspect;
+          const x = startX + i * totalLetterWidth;
+          const y = top + lineIndex * lineHeight;
 
-      const scale = Math.min(...lines.map(calculateScale));
-      const scaledLineHeight = images["A"].height * scale;
-
-      const startY = canvasHeight / 2 - (scaledLineHeight * lineSpacingFactor);
-      lines.forEach((line, index) => {
-        let x = MARGIN_X;
-        let totalLineWidth = line.split("").reduce((acc, char) => {
-          const img = images[char] || images[" "];
-          return acc + img.width * scale;
-        }, 0);
-        x = (canvasWidth - totalLineWidth) / 2;
-
-        let y = startY + index * scaledLineHeight * lineSpacingFactor;
-
-        for (const char of line) {
-          const img = images[char] || images[" "];
-          const w = img.width * scale;
-          const h = img.height * scale;
-          ctx.drawImage(img, x, y, w, h);
-          x += w;
-        }
+          ctx.drawImage(img, x, y, width, height);
+        });
       });
 
-      // Draw "LIKES IT"
+      // Rita "LIKES IT" proportionellt under namnet
       const likesImg = images["likes-it"];
-      const likesScale = scale * 0.7;
-      const likesWidth = likesImg.width * likesScale;
-      const likesHeight = likesImg.height * likesScale;
-      const likesX = (canvasWidth - likesWidth) / 2;
-      const likesY = startY + 2 * scaledLineHeight * lineSpacingFactor + 20;
+      const likesWidth = canvas.width * 0.6;
+      const likesHeight = likesWidth * (likesImg.height / likesImg.width);
+      const likesX = (canvas.width - likesWidth) / 2;
+      const likesY = top + words.length * lineHeight + 50;
+
       ctx.drawImage(likesImg, likesX, likesY, likesWidth, likesHeight);
-    };
+    }
 
-    const generate = () => {
-      const name = document.getElementById("nameInput").value.toUpperCase();
-      drawName(name);
-    };
-
-    (async () => {
-      await loadAllImages();
-      drawName("BT LIKES IT");
-    })();
+    document.getElementById("nameForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      if (firstName && lastName) {
+        await generateImage(firstName, lastName);
+      }
+    });
   </script>
 </body>
 </html>
