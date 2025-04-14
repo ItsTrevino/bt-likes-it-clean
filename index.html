@@ -6,113 +6,98 @@
   <title>BT Likes It</title>
   <style>
     body {
-      background: black;
-      color: white;
       font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
     }
-
     input {
-      padding: 0.5rem;
-      margin: 0.5rem;
+      margin: 5px;
+      padding: 10px;
       font-size: 1rem;
     }
-
     button {
-      padding: 0.5rem 1rem;
+      padding: 10px 20px;
       font-size: 1rem;
-      margin-top: 1rem;
-      cursor: pointer;
+      margin-top: 10px;
     }
-
+    #output {
+      margin-top: 20px;
+    }
     canvas {
-      margin-top: 2rem;
-      border: 1px solid #444;
+      border: 1px solid #ccc;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>BT Likes it – Kampanjsidan är igång</h1>
+  <h1>BT Likes It</h1>
+  <input type="text" id="firstName" placeholder="Förnamn" />
+  <input type="text" id="lastName" placeholder="Efternamn" />
+  <button id="generateButton">Generera</button>
 
-  <div>
-    <input type="text" id="firstName" placeholder="Förnamn" />
-    <input type="text" id="lastName" placeholder="Efternamn" />
-    <br />
-    <button onclick="generateImage()">Generera</button>
+  <div id="output">
+    <canvas id="canvas" width="1080" height="1080"></canvas>
   </div>
 
-  <canvas id="canvas" width="1200" height="630"></canvas>
-
   <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+    const imageBasePath = "images/";
 
-    async function generateImage() {
+    document.getElementById("generateButton").addEventListener("click", async () => {
       const firstName = document.getElementById("firstName").value.trim().toUpperCase();
       const lastName = document.getElementById("lastName").value.trim().toUpperCase();
 
       if (!firstName || !lastName) {
-        alert("Fyll i både för- och efternamn.");
+        alert("Fyll i både förnamn och efternamn!");
         return;
       }
 
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const loadImage = (src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = (err) => reject(err);
+          img.src = src;
+        });
+      };
+
       try {
-        const bg = await loadImage("/images/background.png");
+        const bg = await loadImage(imageBasePath + "background.png");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-        await drawLetters(firstName, 50, 150);
-        await drawLetters(lastName, 50, 350);
+        const fullName = [...firstName, ...lastName];
+        const spacing = 80;
+        const startX = (canvas.width - spacing * fullName.length) / 2;
+        const y = canvas.height / 2 - 50;
 
-        const likeIt = await loadImage("/images/likes-it.png");
-        ctx.drawImage(likeIt, canvas.width - likeIt.width - 50, canvas.height - likeIt.height - 50);
-
-      } catch (err) {
-        console.error("Fel under bildgenerering:", err);
+        for (let i = 0; i < fullName.length; i++) {
+          const char = fullName[i];
+          const safeChar = convertSwedishChar(char);
+          try {
+            const charImg = await loadImage(`${imageBasePath}${safeChar}.png`);
+            ctx.drawImage(charImg, startX + i * spacing, y, 70, 70);
+          } catch (e) {
+            console.error("Kunde inte ladda bokstav:", char);
+          }
+        }
+      } catch (e) {
+        console.error("Fel under bildgenerering:", e);
         alert("Något gick fel – se konsolen för detaljer.");
       }
-    }
+    });
 
-    async function drawLetters(name, startX, startY) {
-      const spacing = 10;
-      let x = startX;
-
-      for (let char of name) {
-        if (char === " ") {
-          x += 40; // extra spacing för mellanslag
-          continue;
-        }
-
-        const normalizedChar = normalizeLetter(char);
-        const letterPath = `/images/${normalizedChar}.png`;
-
-        try {
-          const letterImg = await loadImage(letterPath);
-          ctx.drawImage(letterImg, x, startY);
-          x += letterImg.width + spacing;
-        } catch (error) {
-          console.warn(`Kunde inte ladda bilden: ${letterPath}`);
-        }
+    function convertSwedishChar(char) {
+      switch (char) {
+        case "Å": return "Å";
+        case "Ä": return "Ä";
+        case "Ö": return "Ö";
+        default: return char;
       }
-    }
-
-    function normalizeLetter(char) {
-      const map = {
-        "Å": "Å",
-        "Ä": "Ä",
-        "Ö": "Ö"
-      };
-      return map[char] || char;
-    }
-
-    function loadImage(src) {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = (err) => reject(err);
-        img.src = src;
-      });
     }
   </script>
 </body>
