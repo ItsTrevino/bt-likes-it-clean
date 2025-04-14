@@ -70,21 +70,36 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-        const fullName = [...firstName, ...lastName];
         const spacing = 80;
-        const startX = (canvas.width - spacing * fullName.length) / 2;
-        const y = canvas.height / 2 - 50;
+        const charWidth = 70;
+        const startYFirst = 350;
+        const startYLast = 460;
 
-        for (let i = 0; i < fullName.length; i++) {
-          const char = fullName[i];
-          const safeChar = convertSwedishChar(char);
-          try {
-            const charImg = await loadImage(`${imageBasePath}${safeChar}.png`);
-            ctx.drawImage(charImg, startX + i * spacing, y, 70, 70);
-          } catch (e) {
-            console.error("Kunde inte ladda bokstav:", char);
+        const drawName = async (text, y) => {
+          const chars = [...text];
+          const totalWidth = chars.length * spacing;
+          const startX = (canvas.width - totalWidth) / 2;
+
+          for (let i = 0; i < chars.length; i++) {
+            const char = convertSwedishChar(chars[i]);
+            try {
+              const charImg = await loadImage(`${imageBasePath}${char}.png`);
+              ctx.drawImage(charImg, startX + i * spacing, y, charWidth, charWidth);
+            } catch (e) {
+              console.error("Kunde inte ladda bokstav:", char);
+            }
           }
-        }
+        };
+
+        await drawName(firstName, startYFirst);
+        await drawName(lastName, startYLast);
+
+        // Lägg till "LIKES IT"
+        ctx.fillStyle = "black";
+        ctx.font = "bold 60px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("LIKES IT", canvas.width / 2, 600);
+
       } catch (e) {
         console.error("Fel under bildgenerering:", e);
         alert("Något gick fel – se konsolen för detaljer.");
