@@ -45,79 +45,92 @@
     </div>
 
     <script>
-      async function generateImage() {
-        const firstName = document.getElementById("firstName").value.toUpperCase();
-        const lastName = document.getElementById("lastName").value.toUpperCase();
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
+  async function generateImage() {
+    const firstName = document.getElementById("firstName").value.toUpperCase();
+    const lastName = document.getElementById("lastName").value.toUpperCase();
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-        if (!firstName || !lastName) {
-          alert("Skriv både för- och efternamn!");
-          return;
-        }
+    if (!firstName || !lastName) {
+      alert("Skriv både för- och efternamn!");
+      return;
+    }
 
-        try {
-          const bg = await loadImage("images/background.png");
-          ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+    try {
+      const bg = await loadImage("images/background.png");
+      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-          const allLetters = (firstName.length > lastName.length) ? firstName : lastName;
-          const margin = 30;
-          const availableWidth = canvas.width - 2 * margin;
+      const margin = 30;
+      const spacing = 5; // extra spacing mellan bokstäver
 
-          const letterImages = {};
-          for (let char of new Set((firstName + lastName))) {
-            if (char !== " ") {
-              letterImages[char] = await loadImage(`images/${char}.png`);
-            }
-          }
-          const likesItImage = await loadImage("images/likes-it.png");
+      const allLetters = new Set((firstName + lastName).replace(/ /g, ''));
+      const letterImages = {};
 
-          function getWordWidth(word) {
-            let total = 0;
-            for (let char of word) {
-              if (char === " ") continue;
-              const img = letterImages[char];
-              const aspect = img.width / img.height;
-              total += aspect;
-            }
-            return total;
-          }
+      for (let char of allLetters) {
+        letterImages[char] = await loadImage(`images/${char}.png`);
+      }
 
-          const longestWord = firstName.length > lastName.length ? firstName : lastName;
-          const totalAspect = getWordWidth(longestWord);
-          const targetHeight = (availableWidth / totalAspect); // ensures the total width = availableWidth
-          const topStart = 200;
-          const lineSpacing = targetHeight * 1.5;
+      const likesItImage = await loadImage("images/likes-it.png");
 
-          function drawWord(word, y) {
-            let x = margin;
-            for (let char of word) {
-              if (char === " ") continue;
-              const img = letterImages[char];
-              const aspect = img.width / img.height;
-              const w = targetHeight * aspect;
-              ctx.drawImage(img, x, y, w, targetHeight);
-              x += w;
-            }
-          }
+      function getWordWidth(word, targetHeight) {
+        return Array.from(word).reduce((total, char, i) => {
+          if (char === " ") return total;
+          const img = letterImages[char];
+          const aspect = img.width / img.height;
+          const width = targetHeight * aspect;
+          return total + width + (i < word.length - 1 ? spacing : 0);
+        }, 0);
+      }
 
-          drawWord(firstName, topStart);
-          drawWord(lastName, topStart + lineSpacing);
-          ctx.drawImage(likesItImage, margin, topStart + lineSpacing * 2, availableWidth, targetHeight);
-        } catch (error) {
-          console.error("Fel under bildgenerering: ", error);
-          alert("Något gick fel – se konsolen för detaljer.");
+      const longerName = firstName.length > lastName.length ? firstName : lastName;
+
+      const longestAspectSum = Array.from(longerName).reduce((sum, char) => {
+        const img = letterImages[char];
+        return sum + (img.width / img.height);
+      }, 0);
+      const availableWidth = canvas.width - margin * 2;
+      const targetLetterHeight = (availableWidth - spacing * (longerName.length - 1)) / longestAspectSum;
+
+      const lineSpacing = targetLetterHeight * 1.2;
+      const startY = 150; // justerat från 200 → 150
+
+      function drawWordCentered(word, y) {
+        const wordWidth = getWordWidth(word, targetLetterHeight);
+        let x = (canvas.width - wordWidth) / 2;
+
+        for (let i = 0; i < word.length; i++) {
+          const char = word[i];
+          if (char === " ") continue;
+          const img = letterImages[char];
+          const aspect = img.width / img.height;
+          const w = targetLetterHeight * aspect;
+          ctx.drawImage(img, x, y, w, targetLetterHeight);
+          x += w + spacing;
         }
       }
 
-      function loadImage(src) {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = src;
-        });
-      }
-    </script>
-  </body>
-</html>
+      drawWordCentered(firstName, startY);
+      drawWordCentered(lastName, startY + lineSpacing);
+
+      const likesAspect = likesItImage.width / likesItImage.height;
+      const likesWidth = targetLetterHeight * likesAspect;
+      const likesX = (canvas.width - likesWidth) / 2;
+      const likesY = startY + 2 * lineSpacing;
+
+      ctx.drawImage(likesItImage, likesX, likesY, likesWidth, targetLetterHeight);
+    } catch (error) {
+      console.error("Fel under bildgenerering: ", error);
+      alert("Något gick fel – se konsolen för detaljer.");
+    }
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+</script>
+
