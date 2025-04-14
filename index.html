@@ -22,12 +22,10 @@
       font-size: 1rem;
       margin-top: 10px;
     }
-    #output {
-      margin-top: 20px;
-    }
     canvas {
+      margin-top: 20px;
       border: 1px solid #ccc;
-      margin-top: 10px;
+      max-width: 100%;
     }
   </style>
 </head>
@@ -37,12 +35,13 @@
   <input type="text" id="lastName" placeholder="Efternamn" />
   <button id="generateButton">Generera</button>
 
-  <div id="output">
-    <canvas id="canvas" width="1080" height="1080"></canvas>
-  </div>
+  <canvas id="canvas" width="1080" height="1350"></canvas>
 
   <script>
     const imageBasePath = "images/";
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
     document.getElementById("generateButton").addEventListener("click", async () => {
       const firstName = document.getElementById("firstName").value.trim().toUpperCase();
@@ -53,58 +52,58 @@
         return;
       }
 
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-
-      const loadImage = (src) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = (err) => reject(err);
-          img.src = src;
-        });
-      };
-
       try {
+        // Ladda bakgrundsbild
         const bg = await loadImage(imageBasePath + "background.png");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-        const spacing = 80;
-        const charWidth = 70;
-        const startYFirst = 350;
-        const startYLast = 460;
+        // Rita förnamn och efternamn
+        await drawName(firstName, 380);
+        await drawName(lastName, 540);
 
-        const drawName = async (text, y) => {
-          const chars = [...text];
-          const totalWidth = chars.length * spacing;
-          const startX = (canvas.width - totalWidth) / 2;
-
-          for (let i = 0; i < chars.length; i++) {
-            const char = convertSwedishChar(chars[i]);
-            try {
-              const charImg = await loadImage(`${imageBasePath}${char}.png`);
-              ctx.drawImage(charImg, startX + i * spacing, y, charWidth, charWidth);
-            } catch (e) {
-              console.error("Kunde inte ladda bokstav:", char);
-            }
-          }
-        };
-
-        await drawName(firstName, startYFirst);
-        await drawName(lastName, startYLast);
-
-        // Lägg till "LIKES IT"
-        ctx.fillStyle = "black";
-        ctx.font = "bold 60px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("LIKES IT", canvas.width / 2, 600);
+        // Rita "LIKES IT" som bild
+        const likesItImg = await loadImage(imageBasePath + "likes-it.png");
+        const likesItWidth = 600;
+        const likesItHeight = likesItImg.height * (likesItWidth / likesItImg.width);
+        const likesItX = (canvas.width - likesItWidth) / 2;
+        ctx.drawImage(likesItImg, likesItX, 700, likesItWidth, likesItHeight);
 
       } catch (e) {
         console.error("Fel under bildgenerering:", e);
         alert("Något gick fel – se konsolen för detaljer.");
       }
     });
+
+    async function drawName(text, y) {
+      const chars = [...text];
+      const images = await Promise.all(chars.map(async (char) => {
+        const filename = convertSwedishChar(char);
+        return await loadImage(imageBasePath + filename + ".png");
+      }));
+
+      const totalOriginalWidth = images.reduce((sum, img) => sum + img.width, 0);
+      const maxWidth = canvas.width - 60; // 30px marginal på varje sida
+      const scale = Math.min(1, maxWidth / totalOriginalWidth);
+
+      let x = (canvas.width - totalOriginalWidth * scale) / 2;
+
+      for (let img of images) {
+        const w = img.width * scale;
+        const h = img.height * scale;
+        ctx.drawImage(img, x, y, w, h);
+        x += w;
+      }
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
 
     function convertSwedishChar(char) {
       switch (char) {
