@@ -3,60 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BT Likes It</title>
+  <title>BT Likes it</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #fff;
+      background-color: black;
+      color: white;
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-    }
-    h1 {
-      margin-top: 20px;
-      font-size: 2rem;
-    }
-    form {
-      margin-top: 20px;
-    }
-    input {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      padding: 10px 15px;
-      font-size: 1rem;
-      margin-left: 10px;
-      border: none;
-      border-radius: 5px;
-      background-color: gold;
-      cursor: pointer;
+      margin-top: 2rem;
     }
     canvas {
-      margin-top: 30px;
+      margin-top: 1rem;
+      border: 2px solid white;
+    }
+    input {
+      margin: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: yellow;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>BT – START</h1>
-  <form id="nameForm">
-    <input type="text" id="firstName" placeholder="Förnamn" required>
-    <input type="text" id="lastName" placeholder="Efternamn" required>
-    <button type="submit">Generera</button>
-  </form>
-  <canvas id="canvas" width="1080" height="1350"></canvas>
+  <h1>BT Likes it</h1>
+
+  <input type="text" id="firstName" placeholder="Förnamn">
+  <input type="text" id="lastName" placeholder="Efternamn">
+  <button onclick="generateImage()">Generera</button>
+
+  <canvas id="resultCanvas" width="1200" height="1200"></canvas>
 
   <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
     async function loadImage(src) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -66,67 +51,59 @@
       });
     }
 
-    async function generateImage(firstName, lastName) {
-      const name = (firstName + " " + lastName).toUpperCase();
-      const images = {};
-      const letters = [...new Set(name.replace(/[^A-ZÅÄÖ ]/gi, ""))];
+    async function generateImage() {
+      const firstName = document.getElementById("firstName").value.toUpperCase();
+      const lastName = document.getElementById("lastName").value.toUpperCase();
+      if (!firstName || !lastName) return;
 
-      // Ladda bakgrund och "likes-it"
-      images["background"] = await loadImage("/images/background.png");
-      images["likes-it"] = await loadImage("/images/likes-it.png");
+      const canvas = document.getElementById("resultCanvas");
+      const ctx = canvas.getContext("2d");
 
-      for (const letter of letters) {
-        const filename = letter === " " ? null : letter.toUpperCase();
-        if (filename) {
-          images[letter] = await loadImage(`/images/${filename}.png`);
+      // Ladda bakgrund
+      const bg = await loadImage("images/background.png");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+      const name = [firstName, lastName];
+      const startY = [350, 600]; // Y-positions för för- och efternamn
+      const margin = 30;
+      const imageHeight = 200;
+
+      for (let line = 0; line < name.length; line++) {
+        const letters = name[line].split('');
+        const images = await Promise.all(
+          letters.map(l => loadImage(`images/${normalizeLetter(l)}.png`).catch(() => null))
+        );
+        const validImages = images.filter(img => img);
+        const totalWidth = validImages.reduce((acc, img) => acc + (imageHeight * img.width / img.height), 0);
+        let x = (canvas.width - totalWidth) / 2;
+
+        for (let img of validImages) {
+          const ratio = imageHeight / img.height;
+          const width = img.width * ratio;
+          ctx.drawImage(img, x, startY[line], width, imageHeight);
+          x += width;
         }
       }
 
-      // Rita bakgrund
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(images["background"], 0, 0, canvas.width, canvas.height);
-
-      // Rita namn (bokstav för bokstav)
-      const top = 420;
-      const lineHeight = 250;
-      const startX = 60;
-      const maxWidth = canvas.width - 2 * startX;
-      const words = name.split(" ");
-
-      words.forEach((word, lineIndex) => {
-        const totalLetterWidth = maxWidth / word.length;
-        [...word].forEach((char, i) => {
-          const img = images[char];
-          if (!img) return;
-
-          const aspect = img.height / img.width;
-          const width = totalLetterWidth;
-          const height = width * aspect;
-          const x = startX + i * totalLetterWidth;
-          const y = top + lineIndex * lineHeight;
-
-          ctx.drawImage(img, x, y, width, height);
-        });
-      });
-
-      // Rita "LIKES IT" proportionellt under namnet
-      const likesImg = images["likes-it"];
-      const likesWidth = canvas.width * 0.6;
-      const likesHeight = likesWidth * (likesImg.height / likesImg.width);
-      const likesX = (canvas.width - likesWidth) / 2;
-      const likesY = top + words.length * lineHeight + 50;
-
-      ctx.drawImage(likesImg, likesX, likesY, likesWidth, likesHeight);
+      const likeIt = await loadImage("images/likes-it.png");
+      const likeWidth = canvas.width * 0.4;
+      const likeHeight = likeWidth * (likeIt.height / likeIt.width);
+      ctx.drawImage(likeIt, (canvas.width - likeWidth) / 2, 950, likeWidth, likeHeight);
     }
 
-    document.getElementById("nameForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const firstName = document.getElementById("firstName").value.trim();
-      const lastName = document.getElementById("lastName").value.trim();
-      if (firstName && lastName) {
-        await generateImage(firstName, lastName);
-      }
-    });
+    function normalizeLetter(char) {
+      const map = {
+        'Å': 'Å', 'Ä': 'Ä', 'Ö': 'Ö',
+        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+        'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+        'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+        'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+        'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+        'Z': 'Z'
+      };
+      return map[char] || 'A';
+    }
   </script>
 </body>
 </html>
