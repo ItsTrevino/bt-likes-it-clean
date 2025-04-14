@@ -1,11 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BT Likes It</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 2rem;
+    }
+    canvas {
+      margin-top: 1rem;
+      border: 1px solid #ccc;
+    }
+    input {
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      width: 80%;
+      max-width: 400px;
+    }
+    button {
+      padding: 0.7rem 1.2rem;
+      margin-top: 1rem;
+      font-size: 1rem;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>BT Likes It – Kampanjsidan är igång!</h1>
+  <h1>BT Likes It – Skriv ditt namn</h1>
+  <input type="text" id="nameInput" placeholder="Skriv ditt namn i versaler" />
+  <br />
+  <button onclick="generateImage()">Skapa affisch</button>
+  <br />
+  <canvas id="posterCanvas" width="1080" height="1350"></canvas>
+  <script>
+    async function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    async function generateImage() {
+      const canvas = document.getElementById("posterCanvas");
+      const ctx = canvas.getContext("2d");
+      const name = document.getElementById("nameInput").value.toUpperCase();
+
+      // Load background
+      const bg = await loadImage("public/images/background.png");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+      // Positioning
+      const margin = 30;
+      const availableWidth = canvas.width - margin * 2;
+
+      // Load letters
+      const letterWidth = availableWidth / name.length;
+      const yPos = 100;
+
+      for (let i = 0; i < name.length; i++) {
+        const char = name[i];
+        if (char === " ") continue;
+        try {
+          const img = await loadImage(`public/images/${char}.png`);
+          const x = margin + i * letterWidth;
+          ctx.drawImage(img, x, yPos, letterWidth, letterWidth * 1.2);
+        } catch (err) {
+          console.log(`Missing image for: ${char}`);
+        }
+      }
+
+      // Load and position "likes-it.png"
+      const likes = await loadImage("public/images/likes-it.png");
+      const likesWidth = availableWidth * 0.6;
+      const likesX = (canvas.width - likesWidth) / 2;
+      const likesY = yPos + letterWidth * 1.4;
+      ctx.drawImage(likes, likesX, likesY, likesWidth, likesWidth * 0.3);
+    }
+  </script>
 </body>
 </html>
