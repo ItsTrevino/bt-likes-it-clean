@@ -58,13 +58,17 @@
       background.src = "images/background.png";
 
       const charToFilename = {
-        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
-        'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
-        'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
-        'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
-        'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-        'Z': 'Z', 'Å': 'Å', 'Ä': 'Ä', 'Ö': 'Ö', '&': '&'
-      };
+  'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+  'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+  'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+  'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+  'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+  'Z': 'Z',
+  'Å': 'AA',
+  'Ä': 'AE',
+  'Ö': 'OE',
+  '&': '&'
+};
 
       await new Promise(resolve => {
         background.onload = resolve;
