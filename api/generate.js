@@ -1,3 +1,5 @@
+// trigger rebuild
+
 import { createCanvas, loadImage } from 'canvas';
 
 export default async function handler(req, res) {
