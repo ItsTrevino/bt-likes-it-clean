@@ -202,7 +202,11 @@ const name2Input = document.getElementById("name2").value.trim();
 
     const img = document.getElementById("previewImage");
     img.src = url;
-    img.style.display = "block";
+img.style.display = "block";
+
+const downloadLink = document.getElementById("downloadLink");
+downloadLink.href = url;
+downloadLink.style.display = "inline-block";
   } catch (err) {
     console.error(err);
     alert("Något gick fel med API:et.");
