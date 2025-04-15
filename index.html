@@ -4,120 +4,89 @@
   <meta charset="UTF-8" />
   <title>BT Likes It</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin: 20px;
-    }
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    margin: 20px;
+  }
 
-    .header-img {
-      max-width: 400px;
-      height: auto;
-      margin: 0 auto 30px;
-      display: block;
-    }
+  .header-img {
+    max-width: 400px;
+    height: auto;
+    margin: 0 auto 30px;
+    display: block;
+  }
 
-    .input-row {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-input {
-  padding: 10px;
-  font-size: 16px;
-  height: 40px;
-  width: 170px;
-  box-sizing: border-box;
-}
-
-#generateButton {
-  cursor: pointer;
-  height: 40px;
-}
-
-#placeholder {
-  display: block;
-  margin: 30px auto;
-  max-width: 28%;
-  height: auto;
-  border-radius: 10px;
-}
-
-
-@media screen and (max-width: 600px) {
   .input-row {
-    flex-direction: column;
-    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
   }
 
   input {
-    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    height: 40px;
+    width: 170px;
+    box-sizing: border-box;
   }
 
   #generateButton {
-    width: 55%;
+    cursor: pointer;
+    height: 40px;
+  }
+
+  #placeholder {
+    max-width: 28%;
+    margin: 30px auto;
+    display: block;
     height: auto;
+    border-radius: 10px;
   }
 
-  #placeholder,
   #previewImage {
-    max-width: 60%;
+    max-width: 28%;
+    margin: 30px auto;
+    display: block;
+    height: auto;
+    border-radius: 10px;
   }
 
- #downloadLink {
-  display: none;
-  margin-top: 15px;
-}
-
-#downloadLink img {
-  width: 160px;
-}
-  }
-}
-
-      }
-    }
-    #previewImage {
-  display: none;
-  margin: 30px auto;
-max-width: 28% !important;
-  height: auto;
-  border-radius: 10px;
-}
-
-#downloadLink {
-  display: none;
-  margin-top: 15px;
-}
-
-#downloadLink img {
-  width: 160px;
-}
-
-@media screen and (max-width: 600px) {
-  #previewImage {
-    max-width: 55%;
+  #downloadLink {
+    display: none;
+    margin-top: 15px;
   }
 
   #downloadLink img {
-    width: 130px;
+    width: 160px;
   }
 
-  input {
-    width: 90% !important;
-    display: block;
-    margin: 10px auto;
-  }
+  @media screen and (max-width: 600px) {
+    .input-row {
+      flex-direction: column;
+      align-items: center;
+    }
 
-  .input-row {
-    flex-direction: column;
-    align-items: center;
-  }
-}
+    input {
+      width: 80%;
+    }
 
+    #generateButton {
+      width: 55%;
+      height: auto;
+    }
+
+    #placeholder,
+    #previewImage {
+      max-width: 55%;
+    }
+
+    #downloadLink img {
+      width: 130px;
+    }
+  }
   </style>
 </head>
 <body>
