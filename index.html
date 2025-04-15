@@ -83,17 +83,24 @@
       ctx.drawImage(background, 0, 0);
 
       const loadCharImage = (char) => {
-        return new Promise((resolve, reject) => {
-          const upperChar = char.toLocaleUpperCase('sv-SE');
-          const fileName = charToFilename[upperChar];
-          if (!fileName) return reject(`Tecken stöds ej: ${char}`);
+  return new Promise((resolve) => {
+    const upperChar = char.toLocaleUpperCase('sv-SE');
+    const fileName = charToFilename[upperChar];
+    if (!fileName) {
+      // Returnera ett "tomt steg" för mellanslag eller otillåtna tecken
+      resolve(null);
+      return;
+    }
 
-          const img = new Image();
-          img.src = `images/${fileName}.png`;
-          img.onload = () => resolve(img);
-          img.onerror = () => reject(`Kunde inte ladda: ${img.src}`);
-        });
-      };
+    const img = new Image();
+    img.src = `images/${fileName}.png`;
+    img.onload = () => resolve(img);
+    img.onerror = () => {
+      console.error(`Kunde inte ladda: ${img.src}`);
+      resolve(null); // Om något går fel, hoppa över tecknet tyst
+    };
+  });
+};
 
       try {
         const line1Chars = await Promise.all([...firstNameInput].map(loadCharImage));
@@ -121,16 +128,21 @@
         const yStart = 115;
         const lineSpacing = baseHeight * 1.2;
 
-        const drawLine = (lineImages, y) => {
-          let x = scaleLine(lineImages).xStart;
-          lineImages.forEach(img => {
-            const scale = baseHeight / img.height;
-            const w = img.width * scale;
-            const h = baseHeight;
-            ctx.drawImage(img, x, y, w, h);
-            x += w + spacing;
-          });
-        };
+       const drawLine = (lineImages, y) => {
+  let x = scaleLine(lineImages.filter(img => img !== null)).xStart;
+  lineImages.forEach(img => {
+    if (!img) {
+      // Hantera mellanslag eller saknat tecken – lägg till lite extra mellanrum
+      x += baseHeight * 0.3; // justerbar spacing för mellanslag
+      return;
+    }
+    const scale = baseHeight / img.height;
+    const w = img.width * scale;
+    const h = baseHeight;
+    ctx.drawImage(img, x, y, w, h);
+    x += w + spacing;
+  });
+};
 
         drawLine(line1Chars, yStart);
         drawLine(line2Chars, yStart + lineSpacing);
