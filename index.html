@@ -99,11 +99,12 @@ input {
   <canvas id="resultCanvas" style="display: none;"></canvas>
 
   <!-- Resultatbild -->
-  <img id="previewImage" style="display:none;" />
+  <img id="previewImage" style="display: none; max-width: 100%;" />
 
   <!-- Ladda ner-knapp -->
-  <a id="downloadLink" href="#" download="bt-affisch.png">
-  </a>
+ <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
+  <img src="/images/laddaner.png" alt="Ladda ner" />
+</a>
 
   <script>
   async function generateImage() {
