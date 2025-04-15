@@ -38,6 +38,14 @@
   <canvas id="canvas" width="1080" height="1350"></canvas>
 
   <script>
+    const charToFilename = {
+  'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+  'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+  'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+  'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+  'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+  'Z': 'Z', 'Å': 'Å', 'Ä': 'Ä', 'Ö': 'Ö', '&': '&'
+};
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -59,7 +67,9 @@
           letters.push({ type: 'space', width: spacing * 2 });
           continue;
         }
-        const img = await loadImage(`images/${char}.png`);
+        const filename = charToFilename[char];
+if (!filename) continue; // hoppar över okända tecken
+const img = await loadImage(`images/${filename}.png`);
         const scale = letterHeight / img.height;
         const width = img.width * scale;
         letters.push({ type: 'letter', img, width, height: letterHeight });
