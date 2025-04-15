@@ -1,136 +1,132 @@
 <!DOCTYPE html>
 <html lang="sv">
-  <head>
-    <meta charset="UTF-8" />
-    <title>BT Likes It – Kampanjsidan</title>
-    <style>
-      body {
-        margin: 0;
-        background-color: black;
-        color: white;
-        font-family: sans-serif;
-        text-align: center;
-      }
-
-      canvas {
-        margin-top: 20px;
-        border: 2px solid white;
-      }
-
-      .container {
-        margin-top: 50px;
-      }
-
-      input {
-        font-size: 1.2rem;
-        padding: 8px;
-        margin: 10px;
-      }
-
-      button {
-        font-size: 1.2rem;
-        padding: 10px 20px;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>BT start</h1>
-      <input type="text" id="firstName" placeholder="Förnamn" />
-      <input type="text" id="lastName" placeholder="Efternamn" />
-      <button onclick="generateImage()">Generera</button>
-      <br />
-      <canvas id="canvas" width="1000" height="1400"></canvas>
-    </div>
-
-    <script>
-  async function generateImage() {
-    const firstName = document.getElementById("firstName").value.toUpperCase();
-    const lastName = document.getElementById("lastName").value.toUpperCase();
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    if (!firstName || !lastName) {
-      alert("Skriv både för- och efternamn!");
-      return;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BT start</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
+    canvas {
+      margin-top: 20px;
+      border: 2px solid white;
+    }
+    input {
+      margin: 5px;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      background-color: yellow;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>BT Likes it – Kampanjsidan är igång</h1>
+  <input type="text" id="firstname" placeholder="Förnamn" />
+  <input type="text" id="lastname" placeholder="Efternamn (eller &-namn)" />
+  <button onclick="generate()">Generera</button>
+  <canvas id="result" width="1200" height="630"></canvas>
 
-    try {
-      const bg = await loadImage("images/background.png");
-      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+  <script>
+    async function generate() {
+      const canvas = document.getElementById('result');
+      const ctx = canvas.getContext('2d');
+      const firstName = document.getElementById('firstname').value.toUpperCase().trim();
+      const lastName = document.getElementById('lastname').value.toUpperCase().trim();
 
-      const margin = 30;
-      const spacing = 5; // extra spacing mellan bokstäver
-
-      const allLetters = new Set((firstName + lastName).replace(/ /g, ''));
-      const letterImages = {};
-
-      for (let char of allLetters) {
-        letterImages[char] = await loadImage(`images/${char}.png`);
+      if (!firstName || !lastName) {
+        alert("Fyll i både för- och efternamn!");
+        return;
       }
 
-      const likesItImage = await loadImage("images/likes-it.png");
+      // Ladda bakgrund
+      const bg = new Image();
+      bg.src = 'images/background.png';
 
-      function getWordWidth(word, targetHeight) {
-        return Array.from(word).reduce((total, char, i) => {
-          if (char === " ") return total;
-          const img = letterImages[char];
-          const aspect = img.width / img.height;
-          const width = targetHeight * aspect;
-          return total + width + (i < word.length - 1 ? spacing : 0);
-        }, 0);
-      }
+      bg.onload = async () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      const longerName = firstName.length > lastName.length ? firstName : lastName;
+        const nameLines = [firstName, lastName];
+        const charMap = {
+          "&": "&.png"
+        };
 
-      const longestAspectSum = Array.from(longerName).reduce((sum, char) => {
-        const img = letterImages[char];
-        return sum + (img.width / img.height);
-      }, 0);
-      const availableWidth = canvas.width - margin * 2;
-      const targetLetterHeight = (availableWidth - spacing * (longerName.length - 1)) / longestAspectSum;
+        // Hitta längsta raden
+        const longestLine = nameLines.reduce((a, b) => a.length > b.length ? a : b);
+        const spacing = 10; // mellan bokstäver
+        const marginX = 30;
+        const maxTextHeight = 180;
 
-      const lineSpacing = targetLetterHeight * 1.2;
-      const startY = 150; // justerat från 200 → 150
+        // Beräkna bokstavsstorlek utifrån längsta raden + clamp till maxhöjd
+        const tempImg = new Image();
+        tempImg.src = 'images/A.png';
+        await tempImg.decode();
+        const aspectRatio = tempImg.width / tempImg.height;
 
-      function drawWordCentered(word, y) {
-        const wordWidth = getWordWidth(word, targetLetterHeight);
-        let x = (canvas.width - wordWidth) / 2;
+        const availableWidth = canvas.width - marginX * 2 - spacing * (longestLine.length - 1);
+        const letterWidth = availableWidth / longestLine.length;
+        const letterHeightRaw = letterWidth / aspectRatio;
+        const letterHeight = Math.min(letterHeightRaw, maxTextHeight);
+        const finalLetterWidth = letterHeight * aspectRatio;
 
-        for (let i = 0; i < word.length; i++) {
-          const char = word[i];
-          if (char === " ") continue;
-          const img = letterImages[char];
-          const aspect = img.width / img.height;
-          const w = targetLetterHeight * aspect;
-          ctx.drawImage(img, x, y, w, targetLetterHeight);
-          x += w + spacing;
+        const lineSpacing = letterHeight * 1.2;
+        const startY = 115;
+
+        for (let lineIndex = 0; lineIndex < nameLines.length; lineIndex++) {
+          const name = nameLines[lineIndex];
+          const totalWidth = name.length * finalLetterWidth + (name.length - 1) * spacing;
+          const startX = (canvas.width - totalWidth) / 2;
+          const y = startY + lineIndex * lineSpacing;
+
+          for (let i = 0; i < name.length; i++) {
+            const char = name[i];
+            const fileName = charMap[char] || `${char}.png`;
+            const img = new Image();
+            img.src = `images/${fileName}`;
+            await img.decode();
+            ctx.drawImage(img, startX + i * (finalLetterWidth + spacing), y, finalLetterWidth, letterHeight);
+          }
         }
-      }
 
-      drawWordCentered(firstName, startY);
-      drawWordCentered(lastName, startY + lineSpacing);
+        // Rita "likes-it.png" med samma höjd, och skalad bredd
+        const likesImg = new Image();
+        likesImg.src = 'images/likes-it.png';
+        await likesImg.decode();
 
-      const likesAspect = likesItImage.width / likesItImage.height;
-      const likesWidth = targetLetterHeight * likesAspect;
-      const likesX = (canvas.width - likesWidth) / 2;
-      const likesY = startY + 2 * lineSpacing;
+        const likesRatio = likesImg.width / likesImg.height;
+        const likesWidth = letterHeight * likesRatio;
+        const likesY = startY + 2 * lineSpacing;
+        const likesX = (canvas.width - likesWidth) / 2;
 
-      ctx.drawImage(likesItImage, likesX, likesY, likesWidth, targetLetterHeight);
-    } catch (error) {
-      console.error("Fel under bildgenerering: ", error);
-      alert("Något gick fel – se konsolen för detaljer.");
+        ctx.drawImage(likesImg, likesX, likesY, likesWidth, letterHeight);
+      };
+
+      bg.onerror = (err) => {
+        console.error("Fel under bildgenerering: ", err);
+        alert("Något gick fel – se konsolen för detaljer.");
+      };
     }
-  }
-
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-  }
-</script>
-
+  </script>
+</body>
+</html>
