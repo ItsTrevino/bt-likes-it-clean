@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "buildCommand": null,
+  "devCommand": null,
+  "installCommand": null,
+  "outputDirectory": null,
+  "defaultEnvironment": {},
+  "nodeVersion": "18.x"
+}
