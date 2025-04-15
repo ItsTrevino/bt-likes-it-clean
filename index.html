@@ -106,148 +106,112 @@ input {
   </a>
 
   <script>
-    async function generateImage() {
-      const name1 = document.getElementById("name1").value.trim().toUpperCase();
-      const name2 = document.getElementById("name2").value.trim().toUpperCase();
+  async function generateImage() {
+    const name1 = document.getElementById("name1").value.trim().toUpperCase();
+    const name2 = document.getElementById("name2").value.trim().toUpperCase();
 
-      if (!name1 || !name2) {
-        alert("Fyll i båda namnfälten.");
-        return;
+    if (!name1 || !name2) {
+      alert("Fyll i båda namnfälten.");
+      return;
+    }
 
-        const preview = document.getElementById("previewImage");
-preview.src = canvas.toDataURL("image/png");
-preview.style.display = "block";
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const background = await loadImage("/images/background.png");
 
-document.getElementById("placeholder").style.display = "none";
+    canvas.width = background.width;
+    canvas.height = background.height;
+    ctx.drawImage(background, 0, 0);
 
-const downloadLink = document.getElementById("downloadLink");
-downloadLink.href = preview.src;
-downloadLink.style.display = "inline-block";
-      }
+    const charToFilename = {
+      'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+      'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+      'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+      'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+      'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+      'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
+    };
 
-      const canvas = document.getElementById("resultCanvas");
-      const ctx = canvas.getContext("2d");
+    const spacing = 5;
+    const margin = 30;
+    const maxHeight = 170;
 
-      const background = new Image();
-      background.src = "/images/background.png";
+    const line1Chars = await Promise.all(name1.split("").map(char => loadCharImage(char, charToFilename)));
+    const line2Chars = await Promise.all(name2.split("").map(char => loadCharImage(char, charToFilename)));
+    const likesItImg = await loadImage("/images/likes-it.png");
 
-      const charToFilename = {
-        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
-        'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
-        'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
-        'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
-        'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-        'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
-      };
+    const calculateScaledWidth = (chars, height) => {
+      return chars.reduce((total, img) => {
+        if (!img) return total + height / 4; // spacing for space
+        const scale = height / img.height;
+        return total + img.width * scale + spacing;
+      }, -spacing);
+    };
 
-      const spacing = 5;
-      const margin = 30;
-      const maxHeight = 170;
-
-      const loadCharImage = (char) => {
-        return new Promise((resolve) => {
-          if (char === ' ') return resolve(null);
-          const fileName = charToFilename[char.toUpperCase()];
-          if (!fileName) return resolve(null);
-          const img = new Image();
-          img.src = `/images/${fileName}.png`;
-          img.onload = () => resolve(img);
-          img.onerror = () => {
-            console.error("Kunde inte ladda bokstav:", char);
-            resolve(null);
-          };
-        });
-      };
-
-      const loadImageSafe = (src) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => resolve(img);
-          img.onerror = () => reject(`Kunde inte ladda: ${src}`);
-        });
-      };
-
-      await new Promise((resolve, reject) => {
-        background.onload = resolve;
-        background.onerror = () => reject("Kunde inte ladda bakgrunden.");
-      });
-
-      canvas.width = background.width;
-      canvas.height = background.height;
-      ctx.drawImage(background, 0, 0);
-
-      try {
-        const line1Chars = await Promise.all([...name1].map(loadCharImage));
-        const line2Chars = await Promise.all([...name2].map(loadCharImage));
-        const likesItImg = await loadImageSafe("/images/likes-it.png");
-
-        const calculateScaledWidth = (chars, height) => {
-          return chars.reduce((total, img) => {
-            if (!img) return total + height / 4;
-            const scale = height / img.height;
-            return total + img.width * scale + spacing;
-          }, -spacing);
-        };
-
-        let bestHeight = maxHeight;
-        for (let h = maxHeight; h >= 50; h--) {
-          const maxLineWidth = Math.max(
-            calculateScaledWidth(line1Chars, h),
-            calculateScaledWidth(line2Chars, h),
-            likesItImg.width * (h / likesItImg.height)
-          );
-          if (maxLineWidth + margin * 2 <= canvas.width) {
-            bestHeight = h;
-            break;
-          }
-        }
-
-        const getXStart = (chars) => {
-          const lineWidth = calculateScaledWidth(chars, bestHeight);
-          return (canvas.width - lineWidth) / 2;
-        };
-
-        const drawLine = (chars, y) => {
-          let x = getXStart(chars);
-          chars.forEach(img => {
-            if (!img) {
-              x += bestHeight / 4 + spacing;
-              return;
-            }
-            const scale = bestHeight / img.height;
-            const w = img.width * scale;
-            ctx.drawImage(img, x, y, w, bestHeight);
-            x += w + spacing;
-          });
-        };
-
-        const yStart = 115;
-        const lineSpacing = bestHeight * 1.2;
-
-        drawLine(line1Chars, yStart);
-        drawLine(line2Chars, yStart + lineSpacing);
-
-        const likesItScale = bestHeight / likesItImg.height;
-        const likesItWidth = likesItImg.width * likesItScale;
-        const likesItX = (canvas.width - likesItWidth) / 2;
-        ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
-
-        const preview = document.getElementById("previewImage");
-        preview.src = canvas.toDataURL("image/png");
-        preview.style.display = "block";
-
-        document.getElementById("placeholder").style.display = "none";
-
-        const downloadLink = document.getElementById("downloadLink");
-        downloadLink.href = preview.src;
-        downloadLink.style.display = "inline-block";
-
-      } catch (err) {
-        console.error("Fel under bildgenerering:", err);
-        alert("Något gick fel – se konsolen för detaljer.");
+    let bestHeight = maxHeight;
+    for (let h = maxHeight; h >= 50; h--) {
+      const maxLineWidth = Math.max(
+        calculateScaledWidth(line1Chars, h),
+        calculateScaledWidth(line2Chars, h),
+        likesItImg.width * (h / likesItImg.height)
+      );
+      if (maxLineWidth + margin * 2 <= canvas.width) {
+        bestHeight = h;
+        break;
       }
     }
-  </script>
+
+    const drawLine = (chars, y) => {
+      let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
+      chars.forEach(img => {
+        if (!img) {
+          x += bestHeight / 4 + spacing;
+          return;
+        }
+        const scale = bestHeight / img.height;
+        const w = img.width * scale;
+        ctx.drawImage(img, x, y, w, bestHeight);
+        x += w + spacing;
+      });
+    };
+
+    const yStart = 115;
+    const lineSpacing = bestHeight * 1.2;
+
+    drawLine(line1Chars, yStart);
+    drawLine(line2Chars, yStart + lineSpacing);
+    const likesItScale = bestHeight / likesItImg.height;
+    const likesItWidth = likesItImg.width * likesItScale;
+    const likesItX = (canvas.width - likesItWidth) / 2;
+    ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
+
+    // ✅ Visa bilden och nedladdningsknapp
+    const preview = document.getElementById("previewImage");
+    preview.src = canvas.toDataURL("image/png");
+    preview.style.display = "block";
+
+    document.getElementById("placeholder").style.display = "none";
+
+    const downloadLink = document.getElementById("downloadLink");
+    downloadLink.href = preview.src;
+    downloadLink.style.display = "inline-block";
+  }
+
+  async function loadCharImage(char, map) {
+    if (char === " ") return null;
+    const file = map[char];
+    if (!file) return null;
+    return await loadImage(`/images/${file}.png`);
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(`Kunde inte ladda: ${src}`);
+      img.src = src;
+    });
+  }
+</script>
 </body>
 </html>
