@@ -33,8 +33,8 @@
 <body>
   <h1>BT</h1>
 
-  <input type="text" id="firstName" placeholder="Förnamn eller två namn (t.ex. ANNA & MARTIN)" />
-  <input type="text" id="lastName" placeholder="Efternamn (eller lämna tomt)" />
+ <input type="text" id="name1" placeholder="Namn 1" />
+<input type="text" id="name2" placeholder="Namn 2" />
 
   <br />
   <button onclick="generateImage()">Generera affisch</button>
@@ -43,8 +43,8 @@
 
   <script>
     async function generateImage() {
-  const firstNameInput = document.getElementById("firstName").value.trim();
-  const lastNameInput = document.getElementById("lastName").value.trim();
+  const name1Input = document.getElementById("name1").value.trim();
+const name2Input = document.getElementById("name2").value.trim();
 
   if (!firstNameInput || !lastNameInput) {
     alert("Fyll i både förnamn och efternamn.");
