@@ -23,15 +23,13 @@
     }
 
     canvas {
-      display: block;
-      margin: 40px auto;
-      border: 1px solid #ccc;
-      max-width: 100%;
-    }
+  display: none;
+}
   </style>
 </head>
 <body>
-  <h1>BT</h1>
+  <img src="images/ilikeittoo.png" alt="I like it too" style="max-width: 100%; height: auto; margin-bottom: 30px;" />
+
 
  <input type="text" id="name1" placeholder="Namn 1" />
 <input type="text" id="name2" placeholder="Namn 2" />
@@ -40,13 +38,15 @@
   <button onclick="generateImage()">Generera affisch</button>
 
   <canvas id="resultCanvas"></canvas>
+<img id="placeholder" src="images/tobe.png" alt="Platsbild" style="display: block; margin: 40px auto; max-width: 100%;" />
 
   <hr style="margin: 60px auto; width: 60%;" />
 <h2>TEST: API-versionen</h2>
 
 <input id="namn1" placeholder="Namn 1" />
 <input id="namn2" placeholder="Namn 2" />
-<button id="generateButton" onclick="generateViaAPI()">Generera via API</button>
+<img src="images/skapa.png" id="generateButton" alt="Skapa" onclick="generateViaAPI()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
+
 
 <br /><br />
 <img id="previewImage" style="display:none; max-width: 100%;" />
