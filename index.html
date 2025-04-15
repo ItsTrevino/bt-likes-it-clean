@@ -201,8 +201,10 @@ const name2Input = document.getElementById("name2").value.trim();
     const url = URL.createObjectURL(blob);
 
     const img = document.getElementById("previewImage");
-    img.src = url;
+img.src = url;
 img.style.display = "block";
+
+document.getElementById("placeholder").style.display = "none";
 
 const downloadLink = document.getElementById("downloadLink");
 downloadLink.href = url;
