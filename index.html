@@ -46,8 +46,8 @@
   const name1Input = document.getElementById("name1").value.trim();
 const name2Input = document.getElementById("name2").value.trim();
 
-  if (!firstNameInput || !lastNameInput) {
-    alert("Fyll i både förnamn och efternamn.");
+  if (!name1Input || !name2Input) {
+    alert("Fyll i två namn.");
     return;
   }
 
@@ -99,8 +99,8 @@ const name2Input = document.getElementById("name2").value.trim();
   ctx.drawImage(background, 0, 0);
 
   try {
-    const line1Chars = await Promise.all([...firstNameInput].map(loadCharImage));
-    const line2Chars = await Promise.all([...lastNameInput].map(loadCharImage));
+    const line1Chars = await Promise.all([...name1Input].map(loadCharImage));
+    const line2Chars = await Promise.all([...name2Input].map(loadCharImage));
     const likesItImg = await loadImageSafe("images/likes-it.png");
 
     const spacing = 5;
