@@ -2,10 +2,6 @@
   "name": "bt-likes-it-clean",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "build": "echo 'No build step'",
-    "vercel-build": "echo 'Custom Vercel build if needed'"
-  },
   "dependencies": {
     "canvas": "^2.11.2"
   }
