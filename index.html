@@ -86,8 +86,9 @@
   return new Promise((resolve) => {
     const upperChar = char.toLocaleUpperCase('sv-SE');
     const fileName = charToFilename[upperChar];
+    
     if (!fileName) {
-      // Returnera ett "tomt steg" för mellanslag eller otillåtna tecken
+      // Returnera null för mellanslag eller otillåtna tecken
       resolve(null);
       return;
     }
@@ -97,10 +98,11 @@
     img.onload = () => resolve(img);
     img.onerror = () => {
       console.error(`Kunde inte ladda: ${img.src}`);
-      resolve(null); // Om något går fel, hoppa över tecknet tyst
+      resolve(null);
     };
   });
 };
+
 
       try {
         const line1Chars = await Promise.all([...firstNameInput].map(loadCharImage));
@@ -119,21 +121,29 @@
         const spacing = 5;
 
         const scaleLine = (lineImages) => {
-          const totalOriginalWidth = lineImages.reduce((sum, img) => sum + img.width * (baseHeight / img.height), 0);
-          const totalWidth = totalOriginalWidth + spacing * (lineImages.length - 1);
-          const xStart = (canvas.width - totalWidth) / 2;
-          return { totalWidth, xStart };
-        };
+  const totalOriginalWidth = lineImages
+    .filter(img => img !== null)
+    .reduce((sum, img) => sum + img.width * (baseHeight / img.height), 0);
+
+  const totalSpacing = spacing * (lineImages.filter(img => img !== null).length - 1);
+  const spaceCount = lineImages.filter(img => img === null).length;
+  const spaceWidth = baseHeight * 0.3; // Justerbart mellanrum för mellanslag
+
+  const totalWidth = totalOriginalWidth + totalSpacing + spaceCount * spaceWidth;
+  const xStart = (canvas.width - totalWidth) / 2;
+  return { totalWidth, xStart, spaceWidth };
+};
 
         const yStart = 115;
         const lineSpacing = baseHeight * 1.2;
 
        const drawLine = (lineImages, y) => {
-  let x = scaleLine(lineImages.filter(img => img !== null)).xStart;
+  const { xStart, spaceWidth } = scaleLine(lineImages);
+  let x = xStart;
+
   lineImages.forEach(img => {
     if (!img) {
-      // Hantera mellanslag eller saknat tecken – lägg till lite extra mellanrum
-      x += baseHeight * 0.3; // justerbar spacing för mellanslag
+      x += spaceWidth; // Mellanslag
       return;
     }
     const scale = baseHeight / img.height;
