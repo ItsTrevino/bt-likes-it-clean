@@ -2,7 +2,7 @@
   "name": "bt-likes-it-clean",
   "version": "1.0.0",
   "type": "module",
-  "dependencies": {
-    "canvas": "^2.11.2"
-  }
+ "dependencies": {
+  "@napi-rs/canvas": "^0.1.37"
+}
 }
