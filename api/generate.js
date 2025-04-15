@@ -1,6 +1,6 @@
 // trigger rebuild
 
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas'
 
 export default async function handler(req, res) {
   const { namn1, namn2 } = req.query;
