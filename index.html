@@ -114,7 +114,9 @@
           img.onerror = () => reject("Kunde inte ladda likes-it.png");
         });
 
-        const allCharHeights = [...line1Chars, ...line2Chars].map(img => img.height);
+const allCharHeights = [...line1Chars, ...line2Chars]
+  .filter(img => img !== null)
+  .map(img => img.height);
         const baseHeight = Math.min(Math.max(...allCharHeights), 170);
 
         const margin = 30;
