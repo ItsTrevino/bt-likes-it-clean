@@ -1,247 +1,220 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>BT</title>
+  <meta charset="UTF-8" />
+  <title>BT Likes It</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      margin-top: 40px;
+      margin: 20px;
     }
 
     input {
-      margin: 10px;
       padding: 10px;
       font-size: 16px;
+      margin: 8px;
+      width: 250px;
+      max-width: 80%;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
+    #generateButton {
       cursor: pointer;
+      width: 180px;
+      margin-top: 15px;
     }
 
-    canvas {
-      display: none;
-    }
-
-    .poster-image {
-      width: 75%;
-      max-width: 500px;
-      height: auto;
+    #placeholder, #previewImage {
       display: block;
-      margin: 20px auto;
+      margin: 30px auto;
+      max-width: 75%;
+      height: auto;
       border-radius: 10px;
     }
-    @media screen and (max-width: 600px) {
-    input {
-      display: block;
-      width: 80%;
-      margin: 10px auto;
+
+    #downloadLink {
+      display: none;
+      margin-top: 15px;
     }
 
-    #generateButton,
-    .poster-image {
-      width: 90% !important;
+    #downloadLink img {
+      width: 160px;
     }
-  }
+
+    @media screen and (max-width: 600px) {
+      input {
+        width: 80%;
+        display: block;
+        margin: 10px auto;
+      }
+
+      #generateButton,
+      #placeholder,
+      #previewImage {
+        width: 90% !important;
+      }
+
+      #downloadLink img {
+        width: 140px;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Rubrik som bild -->
+  <img src="images/ilikeittoo.png" alt="Rubrik" style="max-width: 100%; height: auto; margin-bottom: 30px;" />
 
-  <img src="images/ilikeittoo.png" alt="I like it too" class="poster-image" />
-
+  <!-- Namnfält -->
   <input type="text" id="name1" placeholder="Namn 1" />
   <input type="text" id="name2" placeholder="Namn 2" />
-  <br />
-  <img src="images/skapa.png" alt="Skapa" onclick="generateImage()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
 
-  <canvas id="resultCanvas"></canvas>
-  <img id="placeholder" src="images/tobe.png" alt="Platsbild" class="poster-image" />
-  <img id="generatedImage" style="display: none;" class="poster-image" />
+  <!-- Knapp som bild -->
+  <img src="images/skapa.png" id="generateButton" alt="Skapa" onclick="generateImage()" />
 
-  <hr style="margin: 60px auto; width: 60%;" />
-  <h2>TEST: API-versionen</h2>
+  <!-- Placeholder -->
+  <img id="placeholder" src="images/tobe.png" alt="Platsbild" />
 
-  <input id="namn1" placeholder="Namn 1" />
-  <input id="namn2" placeholder="Namn 2" />
-  <img src="images/skapa.png" id="generateButton" alt="Skapa" onclick="generateViaAPI()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
+  <!-- Canvas (dold) -->
+  <canvas id="resultCanvas" style="display: none;"></canvas>
 
-  <br /><br />
-  <img id="previewImage" style="display:none;" class="poster-image" />
+  <!-- Resultatbild -->
+  <img id="previewImage" style="display:none;" />
 
-  <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
-    <img src="images/laddaner.png" alt="Ladda ner" style="margin-top: 15px; width: 160px;" />
+  <!-- Ladda ner-knapp -->
+  <a id="downloadLink" href="#" download="bt-affisch.png">
+    <img src="images/laddaner.png" alt="Ladda ner" />
   </a>
-
-  <!-- Din JS ligger kvar oförändrad nedan (du har ju grym struktur på den) -->
 
   <script>
     async function generateImage() {
-      console.log("generateImage anropad!");
-  const name1Input = document.getElementById("name1").value.trim();
-const name2Input = document.getElementById("name2").value.trim();
+      const name1 = document.getElementById("name1").value.trim().toUpperCase();
+      const name2 = document.getElementById("name2").value.trim().toUpperCase();
 
-  if (!name1Input || !name2Input) {
-    alert("Fyll i två namn.");
-    return;
-  }
+      if (!name1 || !name2) {
+        alert("Fyll i båda namnfälten.");
+        return;
+      }
 
-  const canvas = document.getElementById("resultCanvas");
-  const ctx = canvas.getContext("2d");
+      const canvas = document.getElementById("resultCanvas");
+      const ctx = canvas.getContext("2d");
 
-  const background = new Image();
-  background.src = "images/background.png";
+      const background = new Image();
+      background.src = "images/background.png";
 
-  const charToFilename = {
-    'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
-    'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
-    'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
-    'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
-    'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-    'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
-  };
+      const charToFilename = {
+        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+        'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+        'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+        'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+        'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+        'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
+      };
 
-  const loadCharImage = (char) => {
-    return new Promise((resolve) => {
-      if (char === ' ') return resolve(null); // Mellanslag ger tom yta
-      const upperChar = char.toLocaleUpperCase('sv-SE');
-      const fileName = charToFilename[upperChar];
-      if (!fileName) return resolve(null);
+      const spacing = 5;
+      const margin = 30;
+      const maxHeight = 170;
 
-      const img = new Image();
-      img.src = `images/${fileName}.png`;
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-    });
-  };
+      const loadCharImage = (char) => {
+        return new Promise((resolve) => {
+          if (char === ' ') return resolve(null);
+          const fileName = charToFilename[char.toUpperCase()];
+          if (!fileName) return resolve(null);
+          const img = new Image();
+          img.src = `images/${fileName}.png`;
+          img.onload = () => resolve(img);
+          img.onerror = () => resolve(null);
+        });
+      };
 
-  const loadImageSafe = (src) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(`Kunde inte ladda: ${src}`);
-    });
-  };
+      const loadImageSafe = (src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(`Kunde inte ladda: ${src}`);
+        });
+      };
 
-  await new Promise((resolve, reject) => {
-    background.onload = resolve;
-    background.onerror = () => reject("Kunde inte ladda bakgrund.");
-  });
+      await new Promise((resolve, reject) => {
+        background.onload = resolve;
+        background.onerror = () => reject("Kunde inte ladda bakgrunden.");
+      });
 
-  canvas.width = background.width;
-  canvas.height = background.height;
-  ctx.drawImage(background, 0, 0);
+      canvas.width = background.width;
+      canvas.height = background.height;
+      ctx.drawImage(background, 0, 0);
 
-  try {
-    const line1Chars = await Promise.all([...name1Input].map(loadCharImage));
-    const line2Chars = await Promise.all([...name2Input].map(loadCharImage));
-    const likesItImg = await loadImageSafe("images/likes-it.png");
+      try {
+        const line1Chars = await Promise.all([...name1].map(loadCharImage));
+        const line2Chars = await Promise.all([...name2].map(loadCharImage));
+        const likesItImg = await loadImageSafe("images/likes-it.png");
 
-    const spacing = 5;
-    const margin = 30;
+        const calculateScaledWidth = (chars, height) => {
+          return chars.reduce((total, img) => {
+            if (!img) return total + height / 4;
+            const scale = height / img.height;
+            return total + img.width * scale + spacing;
+          }, -spacing);
+        };
 
-    const calculateScaledWidth = (chars, height) => {
-      return chars.reduce((total, img) => {
-        if (!img) return total + height / 4; // mellanslag
-        const scale = height / img.height;
-        return total + img.width * scale + spacing;
-      }, -spacing); // minus sista spacing
-    };
+        let bestHeight = maxHeight;
+        for (let h = maxHeight; h >= 50; h--) {
+          const maxLineWidth = Math.max(
+            calculateScaledWidth(line1Chars, h),
+            calculateScaledWidth(line2Chars, h),
+            likesItImg.width * (h / likesItImg.height)
+          );
+          if (maxLineWidth + margin * 2 <= canvas.width) {
+            bestHeight = h;
+            break;
+          }
+        }
 
-    // Vi räknar med likes-it också!
-    const allHeights = [line1Chars, line2Chars, [likesItImg]];
+        const getXStart = (chars) => {
+          const lineWidth = calculateScaledWidth(chars, bestHeight);
+          return (canvas.width - lineWidth) / 2;
+        };
 
-    let bestHeight = 170;
-    for (let h = 170; h >= 50; h--) {
-      const maxLineWidth = Math.max(
-        calculateScaledWidth(line1Chars, h),
-        calculateScaledWidth(line2Chars, h),
-        likesItImg.width * (h / likesItImg.height)
-      );
-      if (maxLineWidth + margin * 2 <= canvas.width) {
-        bestHeight = h;
-        break;
+        const drawLine = (chars, y) => {
+          let x = getXStart(chars);
+          chars.forEach(img => {
+            if (!img) {
+              x += bestHeight / 4 + spacing;
+              return;
+            }
+            const scale = bestHeight / img.height;
+            const w = img.width * scale;
+            ctx.drawImage(img, x, y, w, bestHeight);
+            x += w + spacing;
+          });
+        };
+
+        const yStart = 115;
+        const lineSpacing = bestHeight * 1.2;
+
+        drawLine(line1Chars, yStart);
+        drawLine(line2Chars, yStart + lineSpacing);
+
+        const likesItScale = bestHeight / likesItImg.height;
+        const likesItWidth = likesItImg.width * likesItScale;
+        const likesItX = (canvas.width - likesItWidth) / 2;
+        ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
+
+        const preview = document.getElementById("previewImage");
+        preview.src = canvas.toDataURL("image/png");
+        preview.style.display = "block";
+
+        document.getElementById("placeholder").style.display = "none";
+
+        const downloadLink = document.getElementById("downloadLink");
+        downloadLink.href = preview.src;
+        downloadLink.style.display = "inline-block";
+
+      } catch (err) {
+        console.error("Fel under bildgenerering:", err);
+        alert("Något gick fel – se konsolen för detaljer.");
       }
     }
-
-    const getXStart = (chars) => {
-      const lineWidth = calculateScaledWidth(chars, bestHeight);
-      return (canvas.width - lineWidth) / 2;
-    };
-
-    const drawLine = (chars, y) => {
-      let x = getXStart(chars);
-      chars.forEach(img => {
-        if (!img) {
-          x += bestHeight / 4 + spacing; // Mellanslag
-          return;
-        }
-        const scale = bestHeight / img.height;
-        const w = img.width * scale;
-        ctx.drawImage(img, x, y, w, bestHeight);
-        x += w + spacing;
-      });
-    };
-
-    const yStart = 115;
-    const lineSpacing = bestHeight * 1.2;
-
-    drawLine(line1Chars, yStart);
-    drawLine(line2Chars, yStart + lineSpacing);
-
-    const likesItScale = bestHeight / likesItImg.height;
-    const likesItWidth = likesItImg.width * likesItScale;
-    const likesItX = (canvas.width - likesItWidth) / 2;
-    ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
-
-  } catch (err) {
-    console.error("Fel under bildgenerering:", err);
-    alert("Något gick fel – se konsolen för detaljer.");
-  }
-}
-    async function generateViaAPI() {
-      console.log("generateViaAPI anropad!");
-  const namn1 = document.getElementById("namn1").value.trim();
-  const namn2 = document.getElementById("namn2").value.trim();
-
-  if (!namn1 || !namn2) {
-    alert("Fyll i båda fälten!");
-    return;
-  }
-
-  const button = document.getElementById("generateButton");
-  button.disabled = true;
-  button.textContent = "Genererar...";
-
-  try {
-    const response = await fetch(`/api/generate?namn1=${encodeURIComponent(namn1)}&namn2=${encodeURIComponent(namn2)}`);
-    
-    if (!response.ok) throw new Error("Kunde inte generera affisch via API");
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-
-    const img = document.getElementById("previewImage");
-img.src = url;
-img.style.display = "block";
-
-document.getElementById("placeholder").style.display = "none";
-
-const downloadLink = document.getElementById("downloadLink");
-downloadLink.href = url;
-downloadLink.style.display = "inline-block";
-  } catch (err) {
-    console.error(err);
-    alert("Något gick fel med API:et.");
-  } finally {
-    button.disabled = false;
-    button.textContent = "Generera via API";
-  }
-}
-
   </script>
 </body>
 </html>
