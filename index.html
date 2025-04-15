@@ -23,37 +23,47 @@
     }
 
     canvas {
-  display: none;
-}
+      display: none;
+    }
+
+    .poster-image {
+      width: 75%;
+      max-width: 500px;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
-  <img src="images/ilikeittoo.png" alt="I like it too" style="max-width: 100%; height: auto; margin-bottom: 30px;" />
 
+  <img src="images/ilikeittoo.png" alt="I like it too" class="poster-image" />
 
- <input type="text" id="name1" placeholder="Namn 1" />
-<input type="text" id="name2" placeholder="Namn 2" />
-
+  <input type="text" id="name1" placeholder="Namn 1" />
+  <input type="text" id="name2" placeholder="Namn 2" />
   <br />
-  <button onclick="generateImage()">Generera affisch</button>
+  <img src="images/skapa.png" alt="Skapa" onclick="generateImage()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
 
   <canvas id="resultCanvas"></canvas>
-<img id="placeholder" src="images/tobe.png" alt="Platsbild" style="display: block; margin: 40px auto; max-width: 100%;" />
+  <img id="placeholder" src="images/tobe.png" alt="Platsbild" class="poster-image" />
+  <img id="generatedImage" style="display: none;" class="poster-image" />
 
   <hr style="margin: 60px auto; width: 60%;" />
-<h2>TEST: API-versionen</h2>
+  <h2>TEST: API-versionen</h2>
 
-<input id="namn1" placeholder="Namn 1" />
-<input id="namn2" placeholder="Namn 2" />
-<img src="images/skapa.png" id="generateButton" alt="Skapa" onclick="generateViaAPI()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
+  <input id="namn1" placeholder="Namn 1" />
+  <input id="namn2" placeholder="Namn 2" />
+  <img src="images/skapa.png" id="generateButton" alt="Skapa" onclick="generateViaAPI()" style="cursor: pointer; width: 180px; margin-top: 10px;" />
 
-
-<br /><br />
-<img id="previewImage" style="display:none; max-width: 100%;" />
+  <br /><br />
+  <img id="previewImage" style="display:none;" class="poster-image" />
 
   <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
-  <img src="images/laddaner.png" alt="Ladda ner" style="margin-top: 15px; width: 160px;" />
-</a>
+    <img src="images/laddaner.png" alt="Ladda ner" style="margin-top: 15px; width: 160px;" />
+  </a>
+
+  <!-- Din JS ligger kvar oförändrad nedan (du har ju grym struktur på den) -->
 
   <script>
     async function generateImage() {
