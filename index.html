@@ -87,9 +87,13 @@ input {
   height: auto;
 }
 
+#downloadLink {
+  display: none;
+  margin-top: 15px;
+}
+
 #downloadLink img {
   width: 160px;
-  margin-top: 15px;
 }
 
 @media screen and (max-width: 600px) {
@@ -100,7 +104,19 @@ input {
   #downloadLink img {
     width: 130px;
   }
+
+  input {
+    width: 90% !important;
+    display: block;
+    margin: 10px auto;
+  }
+
+  .input-row {
+    flex-direction: column;
+    align-items: center;
+  }
 }
+
   </style>
 </head>
 <body>
