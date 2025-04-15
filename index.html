@@ -32,7 +32,7 @@
 <body>
   <h1>BT 💛</h1>
   <input type="text" id="firstname" placeholder="Förnamn">
-  <input type="text" id="lastname" placeholder="Efternamn (eller &-namn)">
+  <input type="text" id="lastname" placeholder="Efternamn eller &-namn">
   <br />
   <button onclick="generate()">Generera</button>
   <canvas id="canvas" width="1080" height="1350"></canvas>
@@ -50,6 +50,25 @@
       });
     }
 
+    async function loadLetterImages(name, letterHeight) {
+      const spacing = 10;
+      const letters = [];
+
+      for (let char of name) {
+        if (char === ' ') {
+          letters.push({ type: 'space', width: spacing * 2 });
+          continue;
+        }
+        const img = await loadImage(`images/${char}.png`);
+        const scale = letterHeight / img.height;
+        const width = img.width * scale;
+        letters.push({ type: 'letter', img, width, height: letterHeight });
+      }
+
+      const totalWidth = letters.reduce((sum, l) => sum + l.width + (l.type === 'letter' ? spacing : 0), -spacing); // no trailing space
+      return { letters, totalWidth };
+    }
+
     async function generate() {
       const firstName = document.getElementById('firstname').value.toUpperCase();
       const lastName = document.getElementById('lastname').value.toUpperCase();
@@ -60,50 +79,40 @@
       }
 
       try {
-        // Ladda bakgrund
         const background = await loadImage('images/background.png');
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-        const letterHeight = Math.min(180, (canvas.width - 60) / Math.max(firstName.length, lastName.length)); // Maxhöjd + 30px marginal på varje sida
-        const spacing = 10; // Justerbart avstånd mellan bokstäver
-        const topOffset = 115; // Från toppen
+        const longest = Math.max(firstName.length, lastName.length);
+        const letterHeight = Math.min(180, (canvas.width - 60) / longest);
+        const spacing = 10;
+        const topOffset = 115;
         const lineGap = letterHeight * 1.2;
 
-        const renderName = async (name, yPosition) => {
-          let x = (canvas.width - calculateNameWidth(name, letterHeight, spacing)) / 2;
-          for (let char of name) {
-            if (char === ' ') {
-              x += spacing * 2;
-              continue;
-            }
-            const src = `images/${char}.png`;
-            const img = await loadImage(src);
-            const scale = letterHeight / img.height;
-            const letterWidth = img.width * scale;
-            ctx.drawImage(img, x, yPosition, letterWidth, letterHeight);
-            x += letterWidth + spacing;
+        // Rita förnamn
+        const firstData = await loadLetterImages(firstName, letterHeight);
+        let x = (canvas.width - firstData.totalWidth) / 2;
+        for (let item of firstData.letters) {
+          if (item.type === 'space') {
+            x += item.width;
+          } else {
+            ctx.drawImage(item.img, x, topOffset, item.width, letterHeight);
+            x += item.width + spacing;
           }
-        };
+        }
 
-        const calculateNameWidth = (name, height, spacing) => {
-          let total = 0;
-          for (let char of name) {
-            if (char === ' ') {
-              total += spacing * 2;
-              continue;
-            }
-            const img = new Image();
-            img.src = `images/${char}.png`;
-            // Note: vi gissar på ett genomsnitt här, detta kan bytas mot en mer exakt metod vid behov
-            total += (height * 0.7) + spacing;
+        // Rita efternamn
+        const lastData = await loadLetterImages(lastName, letterHeight);
+        x = (canvas.width - lastData.totalWidth) / 2;
+        for (let item of lastData.letters) {
+          if (item.type === 'space') {
+            x += item.width;
+          } else {
+            ctx.drawImage(item.img, x, topOffset + lineGap, item.width, letterHeight);
+            x += item.width + spacing;
           }
-          return total;
-        };
+        }
 
-        await renderName(firstName, topOffset);
-        await renderName(lastName, topOffset + lineGap);
-
-        // Likes it
+        // Rita likes-it
         const likesIt = await loadImage('images/likes-it.png');
         const liHeight = letterHeight;
         const liScale = liHeight / likesIt.height;
