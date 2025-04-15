@@ -43,132 +43,128 @@
 
   <script>
     async function generateImage() {
-      const firstNameInput = document.getElementById("firstName").value.trim();
-      const lastNameInput = document.getElementById("lastName").value.trim();
+  const firstNameInput = document.getElementById("firstName").value.trim();
+  const lastNameInput = document.getElementById("lastName").value.trim();
 
-      if (!firstNameInput || !lastNameInput) {
-        alert("Fyll i både förnamn och efternamn.");
-        return;
-      }
+  if (!firstNameInput || !lastNameInput) {
+    alert("Fyll i både förnamn och efternamn.");
+    return;
+  }
 
-      const canvas = document.getElementById("resultCanvas");
-      const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById("resultCanvas");
+  const ctx = canvas.getContext("2d");
 
-      const background = new Image();
-      background.src = "images/background.png";
+  const background = new Image();
+  background.src = "images/background.png";
 
-      const charToFilename = {
-  'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
-  'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
-  'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
-  'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
-  'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-  'Z': 'Z',
-  'Å': 'AA',
-  'Ä': 'AE',
-  'Ö': 'OE',
-  '&': '&'
-};
+  const charToFilename = {
+    'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+    'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+    'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+    'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+    'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+    'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
+  };
 
-      await new Promise(resolve => {
-        background.onload = resolve;
-        background.onerror = () => {
-          alert("Kunde inte ladda bilden: images/background.png");
-        };
-      });
+  const loadCharImage = (char) => {
+    return new Promise((resolve) => {
+      if (char === ' ') return resolve(null); // Mellanslag ger tom yta
+      const upperChar = char.toLocaleUpperCase('sv-SE');
+      const fileName = charToFilename[upperChar];
+      if (!fileName) return resolve(null);
 
-      // Rensa canvas
-      canvas.width = background.width;
-      canvas.height = background.height;
-      ctx.drawImage(background, 0, 0);
+      const img = new Image();
+      img.src = `images/${fileName}.png`;
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+    });
+  };
 
-      const loadCharImage = (char) => {
-  return new Promise((resolve) => {
-    const upperChar = char.toLocaleUpperCase('sv-SE');
-    const fileName = charToFilename[upperChar];
-    
-    if (!fileName) {
-      // Returnera null för mellanslag eller otillåtna tecken
-      resolve(null);
-      return;
-    }
+  const loadImageSafe = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(`Kunde inte ladda: ${src}`);
+    });
+  };
 
-    const img = new Image();
-    img.src = `images/${fileName}.png`;
-    img.onload = () => resolve(img);
-    img.onerror = () => {
-      console.error(`Kunde inte ladda: ${img.src}`);
-      resolve(null);
+  await new Promise((resolve, reject) => {
+    background.onload = resolve;
+    background.onerror = () => reject("Kunde inte ladda bakgrund.");
+  });
+
+  canvas.width = background.width;
+  canvas.height = background.height;
+  ctx.drawImage(background, 0, 0);
+
+  try {
+    const line1Chars = await Promise.all([...firstNameInput].map(loadCharImage));
+    const line2Chars = await Promise.all([...lastNameInput].map(loadCharImage));
+    const likesItImg = await loadImageSafe("images/likes-it.png");
+
+    const spacing = 5;
+    const margin = 30;
+
+    const calculateScaledWidth = (chars, height) => {
+      return chars.reduce((total, img) => {
+        if (!img) return total + height / 4; // mellanslag
+        const scale = height / img.height;
+        return total + img.width * scale + spacing;
+      }, -spacing); // minus sista spacing
     };
-  });
-};
 
+    // Vi räknar med likes-it också!
+    const allHeights = [line1Chars, line2Chars, [likesItImg]];
 
-      try {
-        const line1Chars = await Promise.all([...firstNameInput].map(loadCharImage));
-        const line2Chars = await Promise.all([...lastNameInput].map(loadCharImage));
-        const likesItImg = await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.src = "images/likes-it.png";
-          img.onload = () => resolve(img);
-          img.onerror = () => reject("Kunde inte ladda likes-it.png");
-        });
-
-const allCharHeights = [...line1Chars, ...line2Chars]
-  .filter(img => img !== null)
-  .map(img => img.height);
-        const baseHeight = Math.min(Math.max(...allCharHeights), 170);
-
-        const margin = 30;
-        const spacing = 5;
-
-        const scaleLine = (lineImages) => {
-  const totalOriginalWidth = lineImages
-    .filter(img => img !== null)
-    .reduce((sum, img) => sum + img.width * (baseHeight / img.height), 0);
-
-  const totalSpacing = spacing * (lineImages.filter(img => img !== null).length - 1);
-  const spaceCount = lineImages.filter(img => img === null).length;
-  const spaceWidth = baseHeight * 0.3; // Justerbart mellanrum för mellanslag
-
-  const totalWidth = totalOriginalWidth + totalSpacing + spaceCount * spaceWidth;
-  const xStart = (canvas.width - totalWidth) / 2;
-  return { totalWidth, xStart, spaceWidth };
-};
-
-        const yStart = 115;
-        const lineSpacing = baseHeight * 1.2;
-
-       const drawLine = (lineImages, y) => {
-  const { xStart, spaceWidth } = scaleLine(lineImages);
-  let x = xStart;
-
-  lineImages.forEach(img => {
-    if (!img) {
-      x += spaceWidth; // Mellanslag
-      return;
-    }
-    const scale = baseHeight / img.height;
-    const w = img.width * scale;
-    const h = baseHeight;
-    ctx.drawImage(img, x, y, w, h);
-    x += w + spacing;
-  });
-};
-
-        drawLine(line1Chars, yStart);
-        drawLine(line2Chars, yStart + lineSpacing);
-
-        const likesItScale = baseHeight / likesItImg.height;
-        const likesItWidth = likesItImg.width * likesItScale;
-        const likesItX = (canvas.width - likesItWidth) / 2;
-        ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, baseHeight);
-
-      } catch (err) {
-        console.error("Fel under bildgenerering:", err);
-        alert("Något gick fel – se konsolen för detaljer.");
+    let bestHeight = 170;
+    for (let h = 170; h >= 50; h--) {
+      const maxLineWidth = Math.max(
+        calculateScaledWidth(line1Chars, h),
+        calculateScaledWidth(line2Chars, h),
+        likesItImg.width * (h / likesItImg.height)
+      );
+      if (maxLineWidth + margin * 2 <= canvas.width) {
+        bestHeight = h;
+        break;
       }
     }
+
+    const getXStart = (chars) => {
+      const lineWidth = calculateScaledWidth(chars, bestHeight);
+      return (canvas.width - lineWidth) / 2;
+    };
+
+    const drawLine = (chars, y) => {
+      let x = getXStart(chars);
+      chars.forEach(img => {
+        if (!img) {
+          x += bestHeight / 4 + spacing; // Mellanslag
+          return;
+        }
+        const scale = bestHeight / img.height;
+        const w = img.width * scale;
+        ctx.drawImage(img, x, y, w, bestHeight);
+        x += w + spacing;
+      });
+    };
+
+    const yStart = 115;
+    const lineSpacing = bestHeight * 1.2;
+
+    drawLine(line1Chars, yStart);
+    drawLine(line2Chars, yStart + lineSpacing);
+
+    const likesItScale = bestHeight / likesItImg.height;
+    const likesItWidth = likesItImg.width * likesItScale;
+    const likesItX = (canvas.width - likesItWidth) / 2;
+    ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
+
+  } catch (err) {
+    console.error("Fel under bildgenerering:", err);
+    alert("Något gick fel – se konsolen för detaljer.");
+  }
+}
   </script>
 </body>
 </html>
