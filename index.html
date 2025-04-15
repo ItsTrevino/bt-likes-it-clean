@@ -113,6 +113,16 @@ input {
       if (!name1 || !name2) {
         alert("Fyll i båda namnfälten.");
         return;
+
+        const preview = document.getElementById("previewImage");
+preview.src = canvas.toDataURL("image/png");
+preview.style.display = "block";
+
+document.getElementById("placeholder").style.display = "none";
+
+const downloadLink = document.getElementById("downloadLink");
+downloadLink.href = preview.src;
+downloadLink.style.display = "inline-block";
       }
 
       const canvas = document.getElementById("resultCanvas");
