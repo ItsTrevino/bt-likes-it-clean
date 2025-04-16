@@ -169,10 +169,8 @@
 
 <div id="shareButtons">
   <a href="#" id="shareFb" aria-label="Dela på Facebook"><img src="/images/fb.png" alt="Facebook" /></a>
-  <a href="#" id="shareInsta" aria-label="Dela på Instagram"><img src="/images/insta.png" alt="Instagram" /></a>
   <a href="#" id="shareWhatsApp" aria-label="Dela på WhatsApp"><img src="/images/whtsp.png" alt="WhatsApp" /></a>
   <a href="#" id="shareSms" aria-label="Dela via SMS"><img src="/images/sms.png" alt="SMS" /></a>
-  <a href="#" id="shareTiktok" aria-label="Dela på TikTok"><img src="/images/tktk.png" alt="TikTok" /></a>
   <a href="#" id="shareX" aria-label="Dela på X"><img src="/images/tw-x.png" alt="X (Twitter)" /></a>
 </div>
 
@@ -304,15 +302,7 @@ document.getElementById("shareWhatsApp").href = `https://wa.me/?text=${shareText
 // Dynamisk länk för SMS (förbättrat stöd)
 document.getElementById("shareSms").href = `sms:?&body=${shareText}%20${shareUrl}`;
 
-// För TikTok och Instagram – visa info
-document.getElementById("shareTiktok").onclick = (e) => {
-  e.preventDefault();
-  alert("Dela din affisch manuellt på TikTok! 📲");
-};
 
-document.getElementById("shareInsta").onclick = (e) => {
-  e.preventDefault();
-  alert("Instagram tillåter inte direktdelning via webben 📸 Spara bilden och dela den manuellt.");
 };
 </script>
 </body>
