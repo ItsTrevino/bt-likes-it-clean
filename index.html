@@ -15,8 +15,14 @@
     height: auto;
     margin: 0 auto 30px;
     display: block;
-  }
+}
 
+@media screen and (max-width: 600px) {
+  .header-img {
+    max-width: 70%; /* Anpassad storlek på mobilen */
+    margin: 20px auto;
+  }
+}
   .input-row {
     display: flex;
     justify-content: center;
@@ -37,6 +43,11 @@
     cursor: pointer;
     height: 40px;
   }
+    @media screen and (max-width: 600px) {
+  #generateButton {
+    transform: scale(0.75);
+  }
+}
 
   #placeholder {
     max-width: 28%;
@@ -53,7 +64,13 @@
     height: auto;
     border-radius: 10px;
   }
-
+@media screen and (max-width: 600px) {
+  #placeholder,
+  #previewImage {
+    max-width: calc(100% - 30px); /* 15px på varje sida */
+    margin: 20px auto;
+  }
+}
   #downloadLink {
     display: none;
     margin-top: 15px;
