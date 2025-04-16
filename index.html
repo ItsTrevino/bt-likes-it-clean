@@ -3,100 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <title>I Like It Too</title>
- <style>
-  body {
-    font-family: sans-serif;
-    text-align: center;
-    margin: 20px;
-  }
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
 
-  .header-img {
-    max-width: 400px;
-    height: auto;
-    margin: 0 auto 30px;
-    display: block;
-  }
-
-  .input-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-
-  input {
-    padding: 10px;
-    font-size: 16px;
-    height: 40px;
-    width: 160px;
-    box-sizing: border-box;
-  }
-
-  #generateButton {
-    cursor: pointer;
-    height: 40px;
-  }
-
-  #placeholder,
-  #previewImage {
-    max-width: 28%;
-    margin: 30px auto;
-    display: block;
-    height: auto;
-    border-radius: 10px;
-  }
-
-  #downloadLink {
-    display: none;
-    margin-top: 15px;
-  }
-
-  #downloadLink img {
-    width: 160px;
-  }
-
-  /* 📱 Mobilanpassningar */
-  @media screen and (max-width: 600px) {
     .header-img {
-      max-width: 70%;
-      margin: 20px auto;
+      max-width: 400px;
+      height: auto;
+      margin: 0 auto 30px;
+      display: block;
     }
 
     .input-row {
-      flex-direction: column;
-      align-items: center;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
     input {
-      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      height: 40px;
+      width: 160px;
+      box-sizing: border-box;
     }
 
     #generateButton {
-      width: 55%;
-      height: auto;
-      transform: scale(0.75);
+      cursor: pointer;
+      height: 40px;
     }
 
     #placeholder,
     #previewImage {
-      width: calc(100% - 30px); /* 15px marginal på varje sida */
-      max-width: 100%;
+      max-width: 28%;
+      margin: 30px auto;
+      display: block;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    #downloadLink {
+      display: none;
+      margin-top: 15px;
     }
 
     #downloadLink img {
-      width: 130px;
+      width: 160px;
     }
-  }
 
-  /* 🖼️ Extra skalning i iframe-läge */
-  body.iframe-mode #generateButton {
-    transform: scale(0.75);
-    transform-origin: center;
-  }
-</style>
+    /* 📱 Mobilanpassningar */
+    @media screen and (max-width: 600px) {
+      .header-img {
+        max-width: 70%;
+        margin: 20px auto;
+      }
+
+      .input-row {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      input {
+        width: 80%;
+      }
+
+      #generateButton {
+        width: 55%;
+        height: auto;
+        transform: scale(0.75);
+      }
+
+      #placeholder,
+      #previewImage {
+        width: calc(100% - 30px); /* 15px marginal på varje sida */
+        max-width: 100%;
+      }
+
+      #downloadLink img {
+        width: 130px;
+      }
+    }
+
+    /* 🖼️ Extra skalning i iframe-läge */
+    body.iframe-mode #generateButton {
+      transform: scale(0.75);
+      transform-origin: center;
+    }
+
+    body.iframe-mode #placeholder,
+    body.iframe-mode #previewImage {
+      max-width: 90%;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- ...ditt innehåll här... -->
+
+  <script>
+    // Lägg till iframe-läge om sidan körs inbäddat
+    if (window.self !== window.top) {
+      document.body.classList.add("iframe-mode");
+    }
+  </script>
+</body>
+</html>
   <!-- Rubrikbild -->
   <img src="/images/ilikeittoo.png" alt="Rubrik" class="header-img" />
 
