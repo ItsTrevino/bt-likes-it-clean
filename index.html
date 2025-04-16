@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>I Like It Too</title>
-  <style>
+ <style>
   body {
     font-family: sans-serif;
     text-align: center;
@@ -15,14 +15,8 @@
     height: auto;
     margin: 0 auto 30px;
     display: block;
-}
-
-@media screen and (max-width: 600px) {
-  .header-img {
-    max-width: 70%; /* Anpassad storlek på mobilen */
-    margin: 20px auto;
   }
-}
+
   .input-row {
     display: flex;
     justify-content: center;
@@ -43,34 +37,16 @@
     cursor: pointer;
     height: 40px;
   }
-    @media screen and (max-width: 600px) {
-  #generateButton {
-    transform: scale(0.75);
-  }
-}
 
-  #placeholder {
-    max-width: 28%;
-    margin: 30px auto;
-    display: block;
-    height: auto;
-    border-radius: 10px;
-  }
-
-  #previewImage {
-    max-width: 28%;
-    margin: 30px auto;
-    display: block;
-    height: auto;
-    border-radius: 10px;
-  }
-@media screen and (max-width: 600px) {
   #placeholder,
   #previewImage {
-    max-width: calc(100% - 30px); /* 15px på varje sida */
-    margin: 20px auto;
+    max-width: 28%;
+    margin: 30px auto;
+    display: block;
+    height: auto;
+    border-radius: 10px;
   }
-}
+
   #downloadLink {
     display: none;
     margin-top: 15px;
@@ -80,7 +56,13 @@
     width: 160px;
   }
 
+  /* 📱 Mobilanpassningar */
   @media screen and (max-width: 600px) {
+    .header-img {
+      max-width: 70%;
+      margin: 20px auto;
+    }
+
     .input-row {
       flex-direction: column;
       align-items: center;
@@ -93,18 +75,26 @@
     #generateButton {
       width: 55%;
       height: auto;
+      transform: scale(0.75);
     }
 
     #placeholder,
     #previewImage {
-      max-width: 55%;
+      width: calc(100% - 30px); /* 15px marginal på varje sida */
+      max-width: 100%;
     }
 
     #downloadLink img {
       width: 130px;
     }
   }
-  </style>
+
+  /* 🖼️ Extra skalning i iframe-läge */
+  body.iframe-mode #generateButton {
+    transform: scale(0.75);
+    transform-origin: center;
+  }
+</style>
 </head>
 <body>
   <!-- Rubrikbild -->
