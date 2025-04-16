@@ -73,6 +73,20 @@
 .share-buttons img:hover {
   transform: scale(1.1);
 }
+    #shareButtons {
+  display: none;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#shareButtons img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
     /* 📱 Mobilanpassningar */
     @media screen and (max-width: 600px) {
       .header-img {
@@ -154,13 +168,13 @@
   <img src="/images/laddaner.png" alt="Ladda ner" />
 </a>
 
-<div class="share-buttons">
-  <a href="#" id="shareFb"><img src="images/fb.png" alt="Facebook" /></a>
-  <a href="#" id="shareX"><img src="images/tw-x.png" alt="X" /></a>
-  <a href="#" id="shareInsta"><img src="images/insta.png" alt="Instagram" /></a>
-  <a href="#" id="shareTikTok"><img src="images/tktk.png" alt="TikTok" /></a>
-  <a href="#" id="shareWhatsapp"><img src="images/whtsp.png" alt="WhatsApp" /></a>
-  <a href="#" id="shareSMS"><img src="images/sms.png" alt="SMS" /></a>
+<div id="shareButtons">
+  <img src="/images/fb.png" id="shareFb" alt="Dela på Facebook" />
+  <img src="/images/insta.png" id="shareInsta" alt="Dela på Instagram" />
+  <img src="/images/whtsp.png" id="shareWhatsApp" alt="Dela på WhatsApp" />
+  <img src="/images/sms.png" id="shareSms" alt="Dela via SMS" />
+  <img src="/images/tktk.png" id="shareTiktok" alt="Dela på TikTok" />
+  <img src="/images/tw-x.png" id="shareX" alt="Dela på X" />
 </div>
 
   <script>
