@@ -168,12 +168,12 @@
 </a>
 
 <div id="shareButtons">
-  <img src="/images/fb.png" id="shareFb" alt="Dela på Facebook" />
-  <img src="/images/insta.png" id="shareInsta" alt="Dela på Instagram" />
-  <img src="/images/whtsp.png" id="shareWhatsApp" alt="Dela på WhatsApp" />
-  <img src="/images/sms.png" id="shareSms" alt="Dela via SMS" />
-  <img src="/images/tktk.png" id="shareTiktok" alt="Dela på TikTok" />
-  <img src="/images/tw-x.png" id="shareX" alt="Dela på X" />
+  <a href="#" id="shareFb" aria-label="Dela på Facebook"><img src="/images/fb.png" alt="Facebook" /></a>
+  <a href="#" id="shareInsta" aria-label="Dela på Instagram"><img src="/images/insta.png" alt="Instagram" /></a>
+  <a href="#" id="shareWhatsApp" aria-label="Dela på WhatsApp"><img src="/images/whtsp.png" alt="WhatsApp" /></a>
+  <a href="#" id="shareSms" aria-label="Dela via SMS"><img src="/images/sms.png" alt="SMS" /></a>
+  <a href="#" id="shareTiktok" aria-label="Dela på TikTok"><img src="/images/tktk.png" alt="TikTok" /></a>
+  <a href="#" id="shareX" aria-label="Dela på X"><img src="/images/tw-x.png" alt="X (Twitter)" /></a>
 </div>
 
   <script>
@@ -284,33 +284,25 @@
       img.src = src;
     });
   }
-    // 💛 Delningsknappar (Facebook, X, WhatsApp, SMS, m.fl.)
-const shareText = encodeURIComponent("Kolla in affischen jag just skapade via kampanjen #ILikeItToo 💛");
+    // 💛 Delningsknappar
+const shareText = encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛");
 const shareUrl = encodeURIComponent(window.location.href);
-const imageUrl = encodeURIComponent(document.getElementById('previewImage')?.src || '');
 
-document.getElementById("shareFb").onclick = () => {
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, "_blank");
+document.getElementById("shareFb").href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+document.getElementById("shareX").href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+document.getElementById("shareWhatsApp").href = `https://wa.me/?text=${shareText}%20${shareUrl}`;
+
+// Dynamisk länk för SMS (förbättrat stöd)
+document.getElementById("shareSms").href = `sms:?&body=${shareText}%20${shareUrl}`;
+
+// För TikTok och Instagram – visa info
+document.getElementById("shareTiktok").onclick = (e) => {
+  e.preventDefault();
+  alert("Dela din affisch manuellt på TikTok! 📲");
 };
 
-document.getElementById("shareX").onclick = () => {
-  window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, "_blank");
-};
-
-document.getElementById("shareWhatsApp").onclick = () => {
-  window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, "_blank");
-};
-
-document.getElementById("shareSms").onclick = () => {
-  const smsBody = `${shareText} ${shareUrl}`;
-  window.location.href = `sms:?&body=${smsBody}`;
-};
-
-document.getElementById("shareTiktok").onclick = () => {
-  alert("Dela din affisch manuellt på TikTok! 📲 TikTok tillåter inte direktdelning via länk.");
-};
-
-document.getElementById("shareInsta").onclick = () => {
+document.getElementById("shareInsta").onclick = (e) => {
+  e.preventDefault();
   alert("Instagram tillåter inte direktdelning via webben 📸 Spara bilden och dela den manuellt.");
 };
 </script>
