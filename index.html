@@ -55,7 +55,24 @@
     #downloadLink img {
       width: 160px;
     }
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
 
+.share-buttons img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.share-buttons img:hover {
+  transform: scale(1.1);
+}
     /* 📱 Mobilanpassningar */
     @media screen and (max-width: 600px) {
       .header-img {
@@ -136,6 +153,15 @@
  <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
   <img src="/images/laddaner.png" alt="Ladda ner" />
 </a>
+
+<div class="share-buttons">
+  <a href="#" id="shareFb"><img src="images/fb.png" alt="Facebook" /></a>
+  <a href="#" id="shareX"><img src="images/tw-x.png" alt="X" /></a>
+  <a href="#" id="shareInsta"><img src="images/insta.png" alt="Instagram" /></a>
+  <a href="#" id="shareTikTok"><img src="images/tktk.png" alt="TikTok" /></a>
+  <a href="#" id="shareWhatsapp"><img src="images/whtsp.png" alt="WhatsApp" /></a>
+  <a href="#" id="shareSMS"><img src="images/sms.png" alt="SMS" /></a>
+</div>
 
   <script>
   async function generateImage() {
@@ -244,6 +270,35 @@
       img.src = src;
     });
   }
+    // 💛 Delningsknappar (Facebook, X, WhatsApp, SMS, m.fl.)
+const shareText = encodeURIComponent("Kolla in affischen jag just skapade via kampanjen #ILikeItToo 💛");
+const shareUrl = encodeURIComponent(window.location.href);
+const imageUrl = encodeURIComponent(document.getElementById('previewImage')?.src || '');
+
+document.getElementById("shareFb").onclick = () => {
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, "_blank");
+};
+
+document.getElementById("shareX").onclick = () => {
+  window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, "_blank");
+};
+
+document.getElementById("shareWhatsApp").onclick = () => {
+  window.open(`https://wa.me/?text=${shareText}%20${shareUrl}`, "_blank");
+};
+
+document.getElementById("shareSms").onclick = () => {
+  const smsBody = `${shareText} ${shareUrl}`;
+  window.location.href = `sms:?&body=${smsBody}`;
+};
+
+document.getElementById("shareTiktok").onclick = () => {
+  alert("Dela din affisch manuellt på TikTok! 📲 TikTok tillåter inte direktdelning via länk.");
+};
+
+document.getElementById("shareInsta").onclick = () => {
+  alert("Instagram tillåter inte direktdelning via webben 📸 Spara bilden och dela den manuellt.");
+};
 </script>
 </body>
 </html>
