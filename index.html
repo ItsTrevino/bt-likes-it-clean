@@ -267,6 +267,11 @@
     downloadLink.href = preview.src;
     downloadLink.style.display = "inline-block";
     document.getElementById("shareButtons").style.display = "flex";
+
+    // workaround SMS
+const smsBody = `${decodeURIComponent(shareText)} ${decodeURIComponent(shareUrl)}`;
+document.getElementById("shareSms").setAttribute("href", `sms:?&body=${encodeURIComponent(smsBody)}`);
+
   }
 
   async function loadCharImage(char, map) {
