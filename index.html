@@ -257,20 +257,24 @@
     ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
 
     // ✅ Visa bilden och nedladdningsknapp
-    const preview = document.getElementById("previewImage");
-    preview.src = canvas.toDataURL("image/png");
-    preview.style.display = "block";
+const preview = document.getElementById("previewImage");
+preview.src = canvas.toDataURL("image/png");
+preview.style.display = "block";
 
-    document.getElementById("placeholder").style.display = "none";
+document.getElementById("placeholder").style.display = "none";
 
-    const downloadLink = document.getElementById("downloadLink");
-    downloadLink.href = preview.src;
-    downloadLink.style.display = "inline-block";
-    document.getElementById("shareButtons").style.display = "flex";
+const downloadLink = document.getElementById("downloadLink");
+downloadLink.href = preview.src;
+downloadLink.style.display = "inline-block";
 
-    // workaround SMS
-const smsBody = `${decodeURIComponent(shareText)} ${decodeURIComponent(shareUrl)}`;
-document.getElementById("shareSms").setAttribute("href", `sms:?&body=${encodeURIComponent(smsBody)}`);
+// ✅ Visa delningsknappar
+document.getElementById("shareButtons").style.display = "flex";
+
+// 💬 Dynamisk SMS-länk (placeras här eftersom preview.src finns nu)
+const shareText = encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛");
+const shareUrl = encodeURIComponent(window.location.href);
+const smsText = `${decodeURIComponent(shareText)} ${decodeURIComponent(shareUrl)}`;
+document.getElementById("shareSms").setAttribute("href", `sms:&body=${encodeURIComponent(smsText)}`);
 
   }
 
