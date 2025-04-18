@@ -179,10 +179,10 @@
     const name1 = document.getElementById("name1").value.trim().toUpperCase();
     const name2 = document.getElementById("name2").value.trim().toUpperCase();
 
-    if (!name1 || !name2) {
-      alert("Fyll i båda namnfälten.");
-      return;
-    }
+    if (!name1 && !name2) {
+  alert("Fyll i minst ett namnfält.");
+  return;
+}
 
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -198,7 +198,7 @@
       'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
       'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
       'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-      'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '&': '&'
+      'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '-': '-','&': '&'
     };
 
     const spacing = 5;
