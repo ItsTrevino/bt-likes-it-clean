@@ -248,7 +248,7 @@ const drawLine = (chars, y, rawText) => {
     const nextChar = rawText[i + 1];
 
     if (prevChar === "L" && currChar === "Y") {
-      x -= spacing * 0.6;
+      x -= spacing * 1.0;
     }
 
     if (currChar === "Y" && ["A", "Å", "Ä"].includes(nextChar)) {
