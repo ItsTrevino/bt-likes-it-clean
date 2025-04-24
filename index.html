@@ -248,11 +248,11 @@ const drawLine = (chars, y, rawText) => {
     const nextChar = rawText[i + 1];
 
     if (prevChar === "L" && currChar === "Y") {
-      x -= spacing * 1.2;
+      x -= spacing * 1.8;
     }
 
     if (currChar === "Y" && ["A", "Å", "Ä"].includes(nextChar)) {
-      x -= spacing * 1.2;
+      x -= spacing * 1.8;
     }
 
     ctx.drawImage(img, x, y, w, bestHeight);
