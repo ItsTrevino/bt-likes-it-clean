@@ -224,28 +224,43 @@
       }
 
       const drawLine = (chars, y, rawText) => {
-        let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
-        for (let i = 0; i < chars.length; i++) {
-          const img = chars[i];
-          if (!img) {
-            x += bestHeight / 4 + spacing;
-            continue;
-          }
-          const scale = bestHeight / img.height;
-          const w = img.width * scale;
+  // Ny korrekt centreringsberäkning
+  const totalWidth = chars.reduce((total, img, i) => {
+    if (!img) return total + bestHeight / 4 + spacing;
+    const scale = bestHeight / img.height;
+    const w = img.width * scale;
+    const prevChar = rawText[i - 1] || "";
+    const currChar = rawText[i] || "";
+    const pair = prevChar + currChar;
+    const adjustment = kerning[pair] || 0;
+    return total + w + spacing + adjustment;
+  }, -spacing);
 
-          const prevChar = rawText[i - 1] || "";
-          const currChar = rawText[i] || "";
-          const pair = prevChar + currChar;
+  let x = (canvas.width - totalWidth) / 2;
 
-          if (kerning[pair]) {
-            x += kerning[pair];
-          }
+  for (let i = 0; i < chars.length; i++) {
+    const img = chars[i];
+    if (!img) {
+      x += bestHeight / 4 + spacing;
+      continue;
+    }
 
-          ctx.drawImage(img, x, y, w, bestHeight);
-          x += w + spacing;
-        }
-      };
+    const scale = bestHeight / img.height;
+    const w = img.width * scale;
+
+    const prevChar = rawText[i - 1] || "";
+    const currChar = rawText[i] || "";
+    const pair = prevChar + currChar;
+
+    if (kerning[pair]) {
+      x += kerning[pair];
+    }
+
+    ctx.drawImage(img, x, y, w, bestHeight);
+    x += w + spacing;
+  }
+};
+
 
       const yStart = 115;
       const lineSpacing = bestHeight * 1.2;
