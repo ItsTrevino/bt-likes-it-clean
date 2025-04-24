@@ -55,38 +55,40 @@
     #downloadLink img {
       width: 160px;
     }
-.share-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
 
-.share-buttons img {
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
 
-.share-buttons img:hover {
-  transform: scale(1.1);
-}
+    .share-buttons img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .share-buttons img:hover {
+      transform: scale(1.1);
+    }
+
     #shareButtons {
-  display: none; /* detta är rätt! */
-  margin-top: 15px;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+      display: none;
+      margin-top: 15px;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
-#shareButtons img {
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-}
-    /* 📱 Mobilanpassningar */
+    #shareButtons img {
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+    }
+
     @media screen and (max-width: 600px) {
       .header-img {
         max-width: 70%;
@@ -110,7 +112,7 @@
 
       #placeholder,
       #previewImage {
-        width: calc(100% - 30px); /* 15px marginal på varje sida */
+        width: calc(100% - 30px);
         max-width: 100%;
       }
 
@@ -119,7 +121,6 @@
       }
     }
 
-    /* 🖼️ Extra skalning i iframe-läge */
     body.iframe-mode #generateButton {
       transform: scale(0.75);
       transform-origin: center;
@@ -132,188 +133,160 @@
   </style>
 </head>
 <body>
-
-  <!-- ...ditt innehåll här... -->
-
-  <script>
-    // Lägg till iframe-läge om sidan körs inbäddat
-    if (window.self !== window.top) {
-      document.body.classList.add("iframe-mode");
-    }
-  </script>
-</body>
-</html>
-  <!-- Rubrikbild -->
   <img src="/images/ilikeittoo.png" alt="Rubrik" class="header-img" />
-
-  <!-- Fält + knapp i rad -->
   <div class="input-row">
     <input type="text" id="name1" placeholder="Namn 1" />
     <input type="text" id="name2" placeholder="Namn 2" />
-    <img src="/images/skapa.png" id="generateButton" alt="Skapa" onclick="generateImage()" />
+    <img src="/images/skapa.png" id="generateButton" alt="Skapa" />
+  </div>
+  <img id="placeholder" src="/images/tobe.png" alt="Platsbild" />
+  <canvas id="resultCanvas" style="display: none;"></canvas>
+  <img id="previewImage" />
+  <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
+    <img src="/images/laddaner.png" alt="Ladda ner" />
+  </a>
+  <div id="shareButtons">
+    <a href="#" id="shareFb"><img src="/images/fb.png" alt="Facebook" /></a>
+    <a href="#" id="shareWhatsApp"><img src="/images/whtsp.png" alt="WhatsApp" /></a>
+    <a href="#" id="shareSms"><img src="/images/sms.png" alt="SMS" /></a>
+    <a href="#" id="shareX"><img src="/images/tw-x.png" alt="X (Twitter)" /></a>
   </div>
 
-  <!-- Placeholder -->
-  <img id="placeholder" src="/images/tobe.png" alt="Platsbild" />
-
-  <!-- Canvas (dold) -->
-  <canvas id="resultCanvas" style="display: none;"></canvas>
-
-  <!-- Resultatbild -->
-<img id="previewImage" />
-
-  <!-- Ladda ner-knapp -->
- <a id="downloadLink" href="#" download="bt-affisch.png" style="display: none;">
-  <img src="/images/laddaner.png" alt="Ladda ner" />
-</a>
-
-<div id="shareButtons">
-  <a href="#" id="shareFb" aria-label="Dela på Facebook"><img src="/images/fb.png" alt="Facebook" /></a>
-  <a href="#" id="shareWhatsApp" aria-label="Dela på WhatsApp"><img src="/images/whtsp.png" alt="WhatsApp" /></a>
-  <a href="#" id="shareSms" aria-label="Dela via SMS"><img src="/images/sms.png" alt="SMS" /></a>
-  <a href="#" id="shareX" aria-label="Dela på X"><img src="/images/tw-x.png" alt="X (Twitter)" /></a>
-</div>
-
   <script>
-  async function generateImage() {
-    const name1 = document.getElementById("name1").value.trim().toUpperCase();
-    const name2 = document.getElementById("name2").value.trim().toUpperCase();
+    async function generateImage() {
+      const name1 = document.getElementById("name1").value.trim().toUpperCase();
+      const name2 = document.getElementById("name2").value.trim().toUpperCase();
 
-    if (!name1 && !name2) {
-  alert("Fyll i minst ett namnfält.");
-  return;
-}
+      if (!name1 && !name2) return;
 
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const background = await loadImage("/images/background.png");
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const background = await loadImage("/images/background.png");
 
-    canvas.width = background.width;
-    canvas.height = background.height;
-    ctx.drawImage(background, 0, 0);
+      canvas.width = background.width;
+      canvas.height = background.height;
+      ctx.drawImage(background, 0, 0);
 
-    const charToFilename = {
-      'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
-      'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
-      'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
-      'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
-      'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
-      'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '-': '-','&': '&'
-    };
+      const charToFilename = {
+        'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+        'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+        'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+        'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+        'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+        'Z': 'Z', 'Å': 'AA', 'Ä': 'AE', 'Ö': 'OE', '-': '-', '&': '&'
+      };
 
-    const spacing = 5;
+      const spacing = 5;
+      const kerning = {
+        "LY": -spacing * 7.0,
+        "YA": -spacing * 7.0,
+        "YÅ": -spacing * 0.8,
+        "YÄ": -spacing * 0.8,
+        "VY": -spacing * 1.0,
+        "AY": -spacing * 1.5,
+        "YV": -spacing * 1.0,
+        "LV": -spacing * 7.0,
+        "VA": -spacing * 7.0
+      };
 
-// 🟨 Lägg till detta direkt här:
-const kerning = {
-  "LY": -spacing * 7.0,
-  "YA": -spacing * 7.0,
-  "YÅ": -spacing * 0.8,
-  "YÄ": -spacing * 0.8,
-  "VY": -spacing * 1.0,
-  "AY": -spacing * 1.5,
-  "YV": -spacing * 1.0,
-   "LV": -spacing * 7.0, 
-  "VA": -spacing * 7.0  
-};
-    const margin = 30;
-    const maxHeight = 170;
+      const margin = 30;
+      const maxHeight = 170;
+      const line1Chars = await Promise.all(name1.split("").map(char => loadCharImage(char, charToFilename)));
+      const line2Chars = await Promise.all(name2.split("").map(char => loadCharImage(char, charToFilename)));
+      const likesItImg = await loadImage("/images/likes-it.png");
 
-    const line1Chars = await Promise.all(name1.split("").map(char => loadCharImage(char, charToFilename)));
-    const line2Chars = await Promise.all(name2.split("").map(char => loadCharImage(char, charToFilename)));
-    const likesItImg = await loadImage("/images/likes-it.png");
+      const calculateScaledWidth = (chars, height) => {
+        return chars.reduce((total, img) => {
+          if (!img) return total + height / 4;
+          const scale = height / img.height;
+          return total + img.width * scale + spacing;
+        }, -spacing);
+      };
 
-    const calculateScaledWidth = (chars, height) => {
-      return chars.reduce((total, img) => {
-        if (!img) return total + height / 4; // spacing for space
-        const scale = height / img.height;
-        return total + img.width * scale + spacing;
-      }, -spacing);
-    };
-
-    let bestHeight = maxHeight;
-    for (let h = maxHeight; h >= 50; h--) {
-      const maxLineWidth = Math.max(
-        calculateScaledWidth(line1Chars, h),
-        calculateScaledWidth(line2Chars, h),
-        likesItImg.width * (h / likesItImg.height)
-      );
-      if (maxLineWidth + margin * 2 <= canvas.width) {
-        bestHeight = h;
-        break;
+      let bestHeight = maxHeight;
+      for (let h = maxHeight; h >= 50; h--) {
+        const maxLineWidth = Math.max(
+          calculateScaledWidth(line1Chars, h),
+          calculateScaledWidth(line2Chars, h),
+          likesItImg.width * (h / likesItImg.height)
+        );
+        if (maxLineWidth + margin * 2 <= canvas.width) {
+          bestHeight = h;
+          break;
+        }
       }
+
+      const drawLine = (chars, y, rawText) => {
+        let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
+        for (let i = 0; i < chars.length; i++) {
+          const img = chars[i];
+          if (!img) {
+            x += bestHeight / 4 + spacing;
+            continue;
+          }
+          const scale = bestHeight / img.height;
+          const w = img.width * scale;
+
+          const prevChar = rawText[i - 1] || "";
+          const currChar = rawText[i] || "";
+          const pair = prevChar + currChar;
+
+          if (kerning[pair]) {
+            x += kerning[pair];
+          }
+
+          ctx.drawImage(img, x, y, w, bestHeight);
+          x += w + spacing;
+        }
+      };
+
+      const yStart = 115;
+      const lineSpacing = bestHeight * 1.2;
+      drawLine(line1Chars, yStart, name1);
+      drawLine(line2Chars, yStart + lineSpacing, name2);
+      const likesItScale = bestHeight / likesItImg.height;
+      const likesItWidth = likesItImg.width * likesItScale;
+      const likesItX = (canvas.width - likesItWidth) / 2;
+      ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
+
+      const preview = document.getElementById("previewImage");
+      preview.src = canvas.toDataURL("image/png");
+      preview.style.display = "block";
+      document.getElementById("placeholder").style.display = "none";
+      const downloadLink = document.getElementById("downloadLink");
+      downloadLink.href = preview.src;
+      downloadLink.style.display = "inline-block";
+      document.getElementById("shareButtons").style.display = "flex";
+      const shareText = encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛");
+      const shareUrl = encodeURIComponent(window.location.href);
+      const smsText = `${decodeURIComponent(shareText)} ${decodeURIComponent(shareUrl)}`;
+      document.getElementById("shareSms").setAttribute("href", `sms:&body=${encodeURIComponent(smsText)}`);
     }
 
-    const drawLine = (chars, y) => {
-      let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
-      chars.forEach(img => {
-        if (!img) {
-          x += bestHeight / 4 + spacing;
-          return;
-        }
-        const scale = bestHeight / img.height;
-        const w = img.width * scale;
-        ctx.drawImage(img, x, y, w, bestHeight);
-        x += w + spacing;
+    async function loadCharImage(char, map) {
+      if (char === " ") return null;
+      const file = map[char];
+      if (!file) return null;
+      return await loadImage(`/images/${file}.png`);
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(`Kunde inte ladda: ${src}`);
+        img.src = src;
       });
-    };
+    }
 
-    const yStart = 115;
-    const lineSpacing = bestHeight * 1.2;
+    document.getElementById("shareFb").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+    document.getElementById("shareX").href = `https://twitter.com/intent/tweet?text=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")}&url=${encodeURIComponent(window.location.href)}`;
+    document.getElementById("shareWhatsApp").href = `https://wa.me/?text=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")} ${encodeURIComponent(window.location.href)}`;
+    document.getElementById("shareSms").href = `sms:?&body=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")} ${encodeURIComponent(window.location.href)}`;
 
-    drawLine(line1Chars, yStart);
-    drawLine(line2Chars, yStart + lineSpacing);
-    const likesItScale = bestHeight / likesItImg.height;
-    const likesItWidth = likesItImg.width * likesItScale;
-    const likesItX = (canvas.width - likesItWidth) / 2;
-    ctx.drawImage(likesItImg, likesItX, yStart + lineSpacing * 2, likesItWidth, bestHeight);
-
-    // ✅ Visa bilden och nedladdningsknapp
-const preview = document.getElementById("previewImage");
-preview.src = canvas.toDataURL("image/png");
-preview.style.display = "block";
-
-document.getElementById("placeholder").style.display = "none";
-
-const downloadLink = document.getElementById("downloadLink");
-downloadLink.href = preview.src;
-downloadLink.style.display = "inline-block";
-
-// ✅ Visa delningsknappar
-document.getElementById("shareButtons").style.display = "flex";
-
-// 💬 Dynamisk SMS-länk (placeras här eftersom preview.src finns nu)
-const shareText = encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛");
-const shareUrl = encodeURIComponent(window.location.href);
-const smsText = `${decodeURIComponent(shareText)} ${decodeURIComponent(shareUrl)}`;
-document.getElementById("shareSms").setAttribute("href", `sms:&body=${encodeURIComponent(smsText)}`);
-
-  }
-
-  async function loadCharImage(char, map) {
-    if (char === " ") return null;
-    const file = map[char];
-    if (!file) return null;
-    return await loadImage(`/images/${file}.png`);
-  }
-
-  function loadImage(src) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(`Kunde inte ladda: ${src}`);
-      img.src = src;
-    });
-  }
-    // 💛 Delningsknappar
-const shareText = encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛");
-const shareUrl = encodeURIComponent(window.location.href);
-
-document.getElementById("shareFb").href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
-document.getElementById("shareX").href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
-document.getElementById("shareWhatsApp").href = `https://wa.me/?text=${shareText}%20${shareUrl}`;
-
-// Dynamisk länk för SMS (förbättrat stöd)
-document.getElementById("shareSms").href = `sms:?&body=${shareText}%20${shareUrl}`;
-</script>
+    // 🔄 Live-preview medan man skriver
+    document.getElementById("name1").addEventListener("input", generateImage);
+    document.getElementById("name2").addEventListener("input", generateImage);
+  </script>
 </body>
 </html>
