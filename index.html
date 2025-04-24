@@ -137,7 +137,7 @@
   <div class="input-row">
     <input type="text" id="name1" placeholder="Namn 1" />
     <input type="text" id="name2" placeholder="Namn 2" />
-    <img src="/images/skapa.png" id="generateButton" alt="Skapa" />
+    <img src="/images/skapa.png" id="generateButton" alt="Skapa" onclick="generateImage()" />
   </div>
   <img id="placeholder" src="/images/tobe.png" alt="Platsbild" />
   <canvas id="resultCanvas" style="display: none;"></canvas>
@@ -186,7 +186,14 @@
         "AY": -spacing * 1.5,
         "YV": -spacing * 1.0,
         "LV": -spacing * 7.0,
-        "VA": -spacing * 7.0
+        "AV": -spacing * 7.0,
+        "ÅV": -spacing * 7.0,
+        "ÄV": -spacing * 7.0,
+        "VA": -spacing * 7.0,
+        "VÅ": -spacing * 7.0,
+        "VÄ": -spacing * 7.0,
+        "VO": -spacing * 0.9,
+        "VÖ": -spacing * 0.9,
       };
 
       const margin = 30;
@@ -283,10 +290,6 @@
     document.getElementById("shareX").href = `https://twitter.com/intent/tweet?text=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")}&url=${encodeURIComponent(window.location.href)}`;
     document.getElementById("shareWhatsApp").href = `https://wa.me/?text=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")} ${encodeURIComponent(window.location.href)}`;
     document.getElementById("shareSms").href = `sms:?&body=${encodeURIComponent("Titta vad jag hittade: #ILikeItToo 💛")} ${encodeURIComponent(window.location.href)}`;
-
-    // 🔄 Live-preview medan man skriver
-    document.getElementById("name1").addEventListener("input", generateImage);
-    document.getElementById("name2").addEventListener("input", generateImage);
   </script>
 </body>
 </html>
