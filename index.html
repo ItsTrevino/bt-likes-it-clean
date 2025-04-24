@@ -252,7 +252,7 @@ const drawLine = (chars, y, rawText) => {
     }
 
     if (currChar === "Y" && ["A", "Å", "Ä"].includes(nextChar)) {
-      x -= spacing * 4.0;
+      x -= spacing * 6.0;
     }
 
     ctx.drawImage(img, x, y, w, bestHeight);
