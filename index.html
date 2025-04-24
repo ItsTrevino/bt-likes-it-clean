@@ -218,37 +218,54 @@
     };
 
     let bestHeight = maxHeight;
-    for (let h = maxHeight; h >= 50; h--) {
-      const maxLineWidth = Math.max(
-        calculateScaledWidth(line1Chars, h),
-        calculateScaledWidth(line2Chars, h),
-        likesItImg.width * (h / likesItImg.height)
-      );
-      if (maxLineWidth + margin * 2 <= canvas.width) {
-        bestHeight = h;
-        break;
-      }
+for (let h = maxHeight; h >= 50; h--) {
+  const maxLineWidth = Math.max(
+    calculateScaledWidth(line1Chars, h),
+    calculateScaledWidth(line2Chars, h),
+    likesItImg.width * (h / likesItImg.height)
+  );
+  if (maxLineWidth + margin * 2 <= canvas.width) {
+    bestHeight = h;
+    break;
+  }
+}
+
+// 🟡 Lägg in drawLine HÄR
+const drawLine = (chars, y, rawText) => {
+  let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
+  for (let i = 0; i < chars.length; i++) {
+    const img = chars[i];
+    if (!img) {
+      x += bestHeight / 4 + spacing;
+      continue;
     }
 
-    const drawLine = (chars, y) => {
-      let x = (canvas.width - calculateScaledWidth(chars, bestHeight)) / 2;
-      chars.forEach(img => {
-        if (!img) {
-          x += bestHeight / 4 + spacing;
-          return;
-        }
-        const scale = bestHeight / img.height;
-        const w = img.width * scale;
-        ctx.drawImage(img, x, y, w, bestHeight);
-        x += w + spacing;
-      });
-    };
+    const scale = bestHeight / img.height;
+    const w = img.width * scale;
 
-    const yStart = 115;
-    const lineSpacing = bestHeight * 1.2;
+    const prevChar = rawText[i - 1];
+    const currChar = rawText[i];
+    const nextChar = rawText[i + 1];
 
-    drawLine(line1Chars, yStart);
-    drawLine(line2Chars, yStart + lineSpacing);
+    if (prevChar === "L" && currChar === "Y") {
+      x -= spacing * 0.6;
+    }
+
+    if (currChar === "Y" && ["A", "Å", "Ä"].includes(nextChar)) {
+      x -= spacing * 0.6;
+    }
+
+    ctx.drawImage(img, x, y, w, bestHeight);
+    x += w + spacing;
+  }
+};
+
+// 🟢 Fortsätt här som vanligt
+const yStart = 115;
+const lineSpacing = bestHeight * 1.2;
+
+drawLine(line1Chars, yStart, name1);
+drawLine(line2Chars, yStart + lineSpacing, name2);
     const likesItScale = bestHeight / likesItImg.height;
     const likesItWidth = likesItImg.width * likesItScale;
     const likesItX = (canvas.width - likesItWidth) / 2;
